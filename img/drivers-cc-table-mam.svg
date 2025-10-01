@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="980" viewBox="0 0 1200 980" role="img" aria-labelledby="title desc">
+  <title id="title">Direct vs Indirect Drivers of Mammal Biodiversity Threats under Climate Change</title>
+  <desc id="desc">Color‑coded table distinguishing direct (climate signal) and indirect/synergistic (human–climate interactions) drivers for terrestrial and aquatic mammals, aligned with IUCN ecosystem‑based framing.</desc>
+  <defs>
+    <style><![CDATA[
+      .bg { fill: #ffffff; }
+      .title { font: 700 26px/1.2 Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 14px/1.4 Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; fill: #475569; }
+      .thead { fill: #0f172a; }
+      .th { font: 600 14px/1.2 Inter, system-ui; fill: #ffffff; }
+      .cell { font: 400 13px/1.45 Inter, system-ui; fill: #0f172a; }
+      .muted { fill: #475569; font: 12px Inter, system-ui; }
+      .panel { fill: #f8fafc; stroke: #e2e8f0; }
+      .direct { fill: #eef2ff; stroke: #6366f1; }
+      .indirect { fill: #fff7ed; stroke: #fb923c; stroke-dasharray: 6 5; }
+      .badge { font: 700 11px/1 Inter, system-ui; text-transform: uppercase; letter-spacing: .08em; }
+      .badge-direct { fill: #6366f1; }
+      .badge-indirect { fill: #fb923c; }
+      .colhead { fill: #111827; font: 600 13px Inter; }
+      .shadow { filter: drop-shadow(0 2px 2px rgba(0,0,0,.08)); }
+    ]]></style>
+    <style><![CDATA[
+      .w { stroke: #94a3b8; }
+      .w-on { fill: #0f172a; stroke: #0f172a; }
+      .w-off { fill: #e2e8f0; stroke: #cbd5e1; }
+    ]]></style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="980" rx="16"/>
+
+  <text class="title" x="600" y="44" text-anchor="middle">Mammal Biodiversity Threat Drivers (Color‑coded)</text>
+  <text class="subtitle" x="600" y="70" text-anchor="middle">Direct = climate signal · Indirect = human–climate synergies · Scope: terrestrial &amp; aquatic mammals</text>
+
+  <!-- Legend -->
+  <g class="shadow">
+    <rect class="panel" x="40" y="88" width="1120" height="100" rx="12"/>
+  </g>
+  <circle cx="70" cy="123" r="9" class="direct"/>
+  <text x="88" y="127" class="cell">Direct drivers (heatwaves, storms, sea‑level rise, drought, ocean warming/acidification, pathogen dynamics)</text>
+  <circle cx="725" cy="123" r="9" class="indirect"/>
+  <text x="743" y="127" class="cell">Indirect / synergistic drivers (land‑use change, fragmentation, conflict, infrastructure, trade, noise)</text>
+  <!-- Weight legend -->
+  <text x="70" y="158" class="cell"><tspan font-weight="600">Weight scale:</tspan> relative importance</text>
+  <g>
+    <circle cx="210" cy="154" r="6" class="w w-on"/>
+    <circle cx="230" cy="154" r="6" class="w w-off"/>
+    <circle cx="250" cy="154" r="6" class="w w-off"/>
+    <circle cx="270" cy="154" r="6" class="w w-off"/>
+    <circle cx="290" cy="154" r="6" class="w w-off"/>
+    <text x="305" y="158" class="muted">Low</text>
+  </g>
+  <g>
+    <circle cx="360" cy="154" r="6" class="w w-on"/>
+    <circle cx="380" cy="154" r="6" class="w w-on"/>
+    <circle cx="400" cy="154" r="6" class="w w-on"/>
+    <circle cx="420" cy="154" r="6" class="w w-off"/>
+    <circle cx="440" cy="154" r="6" class="w w-off"/>
+    <text x="455" y="158" class="muted">Medium</text>
+  </g>
+  <g>
+    <circle cx="540" cy="154" r="6" class="w w-on"/>
+    <circle cx="560" cy="154" r="6" class="w w-on"/>
+    <circle cx="580" cy="154" r="6" class="w w-on"/>
+    <circle cx="600" cy="154" r="6" class="w w-on"/>
+    <circle cx="620" cy="154" r="6" class="w w-off"/>
+    <text x="635" y="158" class="muted">High</text>
+  </g>
+  <g>
+    <circle cx="700" cy="154" r="6" class="w w-on"/>
+    <circle cx="720" cy="154" r="6" class="w w-on"/>
+    <circle cx="740" cy="154" r="6" class="w w-on"/>
+    <circle cx="760" cy="154" r="6" class="w w-on"/>
+    <circle cx="780" cy="154" r="6" class="w w-on"/>
+    <text x="795" y="158" class="muted">Very high</text>
+  </g>
+
+  <!-- Table header -->
+  <g class="thead shadow">
+    <rect x="40" y="176" width="1120" height="40" rx="8" class="thead"/>
+    <text x="80" y="200" class="th">Driver type</text>
+    <text x="260" y="200" class="th">Category</text>
+    <text x="510" y="200" class="th">Terrestrial mammals – examples</text>
+    <text x="830" y="200" class="th">Aquatic mammals – examples</text>
+    <text x="1100" y="200" class="th" text-anchor="end">Weight</text>
+  </g>
+
+  <!-- ROW TEMPLATE functionally repeated as groups -->
+  <!-- DIRECT: Temperature &amp; heat stress -->
+  <g class="shadow">
+    <rect x="40" y="226" width="1120" height="80" rx="10" class="direct"/>
+    <text x="60" y="250" class="badge badge-direct" fill="#fff">DIRECT</text>
+    <text x="260" y="250" class="colhead">Temperature &amp; heat stress</text>
+    <foreignObject x="510" y="232" width="290" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Heatwave mortality (bats, small mammals); reduced fecundity in carnivores/ungulates; den/roost overheating.</div>
+    </foreignObject>
+    <foreignObject x="830" y="232" width="230" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Cetacean thermoregulation stress; pup mortality in pinnipeds; range shifts to cooler waters.</div>
+    </foreignObject>
+    <!-- Weight: 4/5 -->
+    <g transform="translate(1060,232)">
+      <circle cx="10" cy="10" r="6" class="w w-on"/>
+      <circle cx="30" cy="10" r="6" class="w w-on"/>
+      <circle cx="50" cy="10" r="6" class="w w-on"/>
+      <circle cx="70" cy="10" r="6" class="w w-on"/>
+      <circle cx="90" cy="10" r="6" class="w w-off"/>
+    </g>
+  </g>
+
+  <!-- DIRECT: Hydroclimatic extremes -->
+  <g class="shadow">
+    <rect x="40" y="316" width="1120" height="80" rx="10" class="direct"/>
+    <text x="60" y="340" class="badge badge-direct" fill="#fff">DIRECT</text>
+    <text x="260" y="340" class="colhead">Hydroclimatic extremes (drought/flood)</text>
+    <foreignObject x="510" y="322" width="290" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Vegetation loss → prey decline; collapse of water refuges; increased wildfire exposure; altered migration.</div>
+    </foreignObject>
+    <foreignObject x="830" y="322" width="230" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Reduced river discharge (river dolphins/manatees); inundation of haul‑outs; flash‑flood stranding.</div>
+    </foreignObject>
+    <!-- Weight: 5/5 -->
+    <g transform="translate(1060,322)">
+      <circle cx="10" cy="10" r="6" class="w w-on"/>
+      <circle cx="30" cy="10" r="6" class="w w-on"/>
+      <circle cx="50" cy="10" r="6" class="w w-on"/>
+      <circle cx="70" cy="10" r="6" class="w w-on"/>
+      <circle cx="90" cy="10" r="6" class="w w-on"/>
+    </g>
+  </g>
+
+  <!-- DIRECT: Sea-level rise &amp; storms -->
+  <g class="shadow">
+    <rect x="40" y="406" width="1120" height="80" rx="10" class="direct"/>
+    <text x="60" y="430" class="badge badge-direct" fill="#fff">DIRECT</text>
+    <text x="260" y="430" class="colhead">Sea‑level rise &amp; cyclonic storms</text>
+    <foreignObject x="510" y="412" width="290" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Coastal refuge loss; saline intrusion into lowland forests; displacement from deltas and estuaries.</div>
+    </foreignObject>
+    <foreignObject x="830" y="412" width="230" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Rookery/beach loss; storm‑driven pup mortality; haul‑out erosion.</div>
+    </foreignObject>
+    <!-- Weight: 3/5 -->
+    <g transform="translate(1060,412)">
+      <circle cx="10" cy="10" r="6" class="w w-on"/>
+      <circle cx="30" cy="10" r="6" class="w w-on"/>
+      <circle cx="50" cy="10" r="6" class="w w-on"/>
+      <circle cx="70" cy="10" r="6" class="w w-off"/>
+      <circle cx="90" cy="10" r="6" class="w w-off"/>
+    </g>
+  </g>
+
+  <!-- DIRECT: Ocean warming &amp; acidification -->
+  <g class="shadow">
+    <rect x="40" y="496" width="1120" height="80" rx="10" class="direct"/>
+    <text x="60" y="520" class="badge badge-direct" fill="#fff">DIRECT</text>
+    <text x="260" y="520" class="colhead">Ocean warming &amp; acidification</text>
+    <foreignObject x="510" y="502" width="290" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">—</div>
+    </foreignObject>
+    <foreignObject x="830" y="502" width="230" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Prey base decline &amp; trophic mismatch; distribution shifts; altered foraging success.</div>
+    </foreignObject>
+    <!-- Weight: 4/5 (aquatic relevance) -->
+    <g transform="translate(1060,502)">
+      <circle cx="10" cy="10" r="6" class="w w-on"/>
+      <circle cx="30" cy="10" r="6" class="w w-on"/>
+      <circle cx="50" cy="10" r="6" class="w w-on"/>
+      <circle cx="70" cy="10" r="6" class="w w-on"/>
+      <circle cx="90" cy="10" r="6" class="w w-off"/>
+    </g>
+  </g>
+
+  <!-- DIRECT: Disease emergence -->
+  <g class="shadow">
+    <rect x="40" y="586" width="1120" height="80" rx="10" class="direct"/>
+    <text x="60" y="610" class="badge badge-direct" fill="#fff">DIRECT</text>
+    <text x="260" y="610" class="colhead">Disease dynamics</text>
+    <foreignObject x="510" y="592" width="290" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Distemper (canids/mustelids), hantavirus in rodents; heat‑facilitated parasite burdens.</div>
+    </foreignObject>
+    <foreignObject x="830" y="592" width="230" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Morbillivirus &amp; toxoplasmosis in dolphins; harmful algal blooms.</div>
+    </foreignObject>
+    <!-- Weight: 3/5 -->
+    <g transform="translate(1060,592)">
+      <circle cx="10" cy="10" r="6" class="w w-on"/>
+      <circle cx="30" cy="10" r="6" class="w w-on"/>
+      <circle cx="50" cy="10" r="6" class="w w-on"/>
+      <circle cx="70" cy="10" r="6" class="w w-off"/>
+      <circle cx="90" cy="10" r="6" class="w w-off"/>
+    </g>
+  </g>
+
+  <!-- INDIRECT: Habitat loss &amp; fragmentation -->
+  <g class="shadow">
+    <rect x="40" y="686" width="1120" height="80" rx="10" class="indirect"/>
+    <text x="60" y="710" class="badge badge-indirect" fill="#fff">INDIRECT</text>
+    <text x="260" y="710" class="colhead">Habitat loss &amp; fragmentation</text>
+    <foreignObject x="510" y="692" width="290" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Drought/fire → forest conversion; corridor loss for jaguars/tapirs; urban sprawl intensifies heat &amp; barriers.</div>
+    </foreignObject>
+    <foreignObject x="830" y="692" width="230" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Mangrove/wetland loss reduces manatee shelter; coastal development blocks haul‑outs.</div>
+    </foreignObject>
+    <!-- Weight: 5/5 -->
+    <g transform="translate(1060,692)">
+      <circle cx="10" cy="10" r="6" class="w w-on"/>
+      <circle cx="30" cy="10" r="6" class="w w-on"/>
+      <circle cx="50" cy="10" r="6" class="w w-on"/>
+      <circle cx="70" cy="10" r="6" class="w w-on"/>
+      <circle cx="90" cy="10" r="6" class="w w-on"/>
+    </g>
+  </g>
+
+  <!-- INDIRECT: Prey-web shifts &amp; cascades -->
+  <g class="shadow">
+    <rect x="40" y="776" width="1120" height="80" rx="10" class="indirect"/>
+    <text x="60" y="800" class="badge badge-indirect" fill="#fff">INDIRECT</text>
+    <text x="260" y="800" class="colhead">Prey‑web shifts &amp; trophic cascades</text>
+    <foreignObject x="510" y="782" width="290" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Vegetation/productivity changes reduce herbivore prey; cascading effects on carnivores; mesopredator release.</div>
+    </foreignObject>
+    <foreignObject x="830" y="782" width="230" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Fish stock collapse → dolphin/seal food scarcity; shifts concentrate whales near shipping lanes.</div>
+    </foreignObject>
+    <!-- Weight: 4/5 -->
+    <g transform="translate(1060,782)">
+      <circle cx="10" cy="10" r="6" class="w w-on"/>
+      <circle cx="30" cy="10" r="6" class="w w-on"/>
+      <circle cx="50" cy="10" r="6" class="w w-on"/>
+      <circle cx="70" cy="10" r="6" class="w w-on"/>
+      <circle cx="90" cy="10" r="6" class="w w-off"/>
+    </g>
+  </g>
+
+  <!-- INDIRECT: Conflict &amp; infrastructure -->
+  <g class="shadow">
+    <rect x="40" y="866" width="1120" height="80" rx="10" class="indirect"/>
+    <text x="60" y="890" class="badge badge-indirect" fill="#fff">INDIRECT</text>
+    <foreignObject x="260" y="872" width="270" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="colhead"><b>Conflict &amp; infrastructure</b></div>
+    </foreignObject>
+    <foreignObject x="510" y="872" width="290" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Drought → new dams/pipelines; roads expand with land‑use change; retaliatory killing near farms.</div>
+    </foreignObject>
+    <foreignObject x="830" y="872" width="230" height="66">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="cell">Ports, seawalls, traffic disrupt movement; higher ship‑strike &amp; noise exposure as routes intensify.</div>
+    </foreignObject>
+    <!-- Weight: 3/5 -->
+    <g transform="translate(1060,872)">
+      <circle cx="10" cy="10" r="6" class="w w-on"/>
+      <circle cx="30" cy="10" r="6" class="w w-on"/>
+      <circle cx="50" cy="10" r="6" class="w w-on"/>
+      <circle cx="70" cy="10" r="6" class="w w-off"/>
+      <circle cx="90" cy="10" r="6" class="w w-off"/>
+    </g>
+  </g>
+
+  <!-- Footer note -->
+  <text x="600" y="960" text-anchor="middle" class="muted">Align actions with IUCN NbS/EbA: protect–restore–manage habitats, reduce direct climate hazards, and address indirect human–climate synergies.</text>
+</svg>

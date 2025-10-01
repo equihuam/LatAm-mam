@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="700" viewBox="0 0 1000 700" role="img" aria-labelledby="title desc">
+  <title id="title">Drivers of Climate Vulnerability for Mammal Biodiversity (IUCN ecosystem-based framing)</title>
+  <desc id="desc">Diagram showing how Exposure, Sensitivity, and Adaptive Capacity interact to determine Climate Vulnerability, with cross-cutting modifiers (Governance, Equity, Finance, Knowledge) and examples relevant to Latin America.</desc>
+
+  <defs>
+    <!-- Colors -->
+    <style><![CDATA[
+      .bg { fill: #ffffff; }
+      .panel { fill: #f7f9fc; stroke: #c7d2fe; }
+      .box { fill: #eef2ff; stroke: #6366f1; }
+      .box2 { fill: #ecfeff; stroke: #06b6d4; }
+      .box3 { fill: #eafff3; stroke: #22c55e; }
+      .box4 { fill: #fff7ed; stroke: #fb923c; }
+      .center { fill: #fef9c3; stroke: #eab308; }
+      .legend { fill: #f1f5f9; stroke: #94a3b8; }
+      .text-title { font: 700 24px/1.2 Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; fill: #111827; }
+      .text-sub { font: 600 18px/1.2 Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; fill: #111827; }
+      .text-body { font: 400 14px/1.4 Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; fill: #0f172a; }
+      .muted { fill: #475569; font: 400 12px/1.3 Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; }
+      .eq { font-style: italic; }
+      .cap { text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; font-size: 12px; fill: #334155; }
+      .dashed { stroke-dasharray: 6 6; }
+      .shadow { filter: drop-shadow(0 2px 2px rgba(0,0,0,0.08)); }
+    ]]></style>
+
+    <!-- Arrow markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a" />
+    </marker>
+    <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" x="0" y="0" width="1000" height="700" rx="16"/>
+
+  <!-- Header -->
+  <text x="500" y="52" text-anchor="middle" class="text-title">Drivers of Climate Vulnerability</text>
+  <text x="500" y="78" text-anchor="middle" class="muted">IUCN ecosystem-based framing · Mammals (terrestrial & aquatic) · Vulnerability = f(Exposure + Sensitivity − Adaptive Capacity)</text>
+
+  <!-- Panels for layout -->
+  <g class="shadow">
+    <rect class="panel" x="40" y="110" width="920" height="430" rx="14"/>
+  </g>
+
+  <!-- Boxes: Exposure, Sensitivity, Adaptive Capacity, Cross-cutting modifiers -->
+  <!-- Exposure -->
+  <g id="exposure" class="shadow">
+    <rect class="box" x="60" y="140" width="260" height="160" rx="14"/>
+    <text class="text-sub" x="80" y="168">Exposure</text>
+    <text class="muted" x="80" y="190">Climate & hazard footprint (mammal-relevant)</text>
+    <foreignObject x="80" y="200" width="220" height="110">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="text-body">
+        <ul style="margin:0; padding-left:18px">
+          <li><b>Heatwaves/drought</b> → mortality, prey shifts (terrestrial)</li>
+          <li><b>Storms/sea‑level rise</b> → rookery/haul‑out loss (aquatic/coastal)</li>
+          <li><b>Marine heat & acidification</b> → prey base change (cetaceans, pinnipeds)</li>
+          <li><b>Hydro‑climatic extremes</b> → river flow change (river dolphins, otters)</li>
+        </ul>
+      </div>
+    </foreignObject>
+  </g>
+
+  <!-- Sensitivity -->
+  <g id="sensitivity" class="shadow">
+    <rect class="box2" x="370" y="140" width="260" height="160" rx="14"/>
+    <text class="text-sub" x="390" y="168">Sensitivity</text>
+    <text class="muted" x="390" y="190">Systems & ecosystem condition (mammal habitats)</text>
+    <foreignObject x="390" y="200" width="220" height="120">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="text-body">
+        <ul style="margin:0; padding-left:18px">
+          <li><b>Habitat loss/fragmentation</b> (forests, savannas, wetlands)</li>
+          <li><b>Connectivity barriers</b> (roads, dams; migration routes)</li>
+          <li><b>Rookery/roost dependence</b> (beaches, caves, islets)</li>
+          <li><b>Prey web shifts & disease</b> (e.g., distemper, toxoplasmosis)</li>
+        </ul>
+      </div>
+    </foreignObject>
+  </g>
+
+  <!-- Adaptive Capacity -->
+  <g id="adaptive" class="shadow">
+    <rect class="box3" x="680" y="140" width="260" height="160" rx="14"/>
+    <text class="text-sub" x="700" y="168">Adaptive Capacity</text>
+    <text class="muted" x="700" y="190">Assets, institutions, knowledge (for mammals)</text>
+    <foreignObject x="700" y="200" width="220" height="120">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="text-body">
+        <ul style="margin:0; padding-left:18px">
+          <li><b>Protected & conserved areas</b> with <b>connectivity</b> (OECMs, corridors)</li>
+          <li><b>Fisheries & shipping rules</b> (bycatch mitigation, speed limits, noise)</li>
+          <li><b>Wildlife health surveillance</b> & conflict mitigation</li>
+          <li><b>Community/Indigenous stewardship</b> & NbS/EbA uptake</li>
+        </ul>
+      </div>
+    </foreignObject>
+  </g>
+
+  <!-- Center: Vulnerability -->
+  <g id="center" class="shadow">
+    <rect class="center" x="290" y="340" width="420" height="160" rx="18"/>
+    <text class="text-sub" x="500" y="372" text-anchor="middle">Climate Vulnerability / Risk</text>
+    <text class="muted eq" x="500" y="392" text-anchor="middle">V ≈ Exposure + Sensitivity − Adaptive Capacity</text>
+    <foreignObject x="310" y="402" width="380" height="100">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="text-body" style="text-align:center;">
+        <p style="margin:0 0 2px 0"><b>IUCN lens for mammals:</b> use <i>Nature‑based Solutions (NbS)</i> & Ecosystem‑based Adaptation (EbA)</p>
+        <p style="margin:0">Protect · Restore · Sustainably manage habitats to reduce hazard exposure,
+          dampen sensitivity (prey/habitat), and strengthen adaptive capacity (corridors, governance).</p>
+      </div>
+    </foreignObject>
+  </g>
+
+  <!-- Cross-cutting modifiers -->
+  <g id="modifiers" class="shadow">
+    <rect class="box4" x="60" y="520" width="880" height="80" rx="14"/>
+    <text class="cap" x="80" y="545">Cross‑cutting modifiers (mammal conservation)</text>
+    <foreignObject x="80" y="552" width="840" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="text-body">
+        Governance & equity · Indigenous/local rights · Anti‑poaching & wildlife trade control · Fisheries management & MPAs · Shipping lanes & acoustic sanctuaries · Human‑wildlife conflict · Land tenure · Data/monitoring (eDNA, telemetry)
+      </div>
+    </foreignObject>
+  </g>
+
+  <!-- Arrows to center -->
+  <g stroke="#0f172a" stroke-width="2.5" fill="none" marker-end="url(#arrow)">
+    <!-- Solid arrows = direct drivers (e.g., storms destroying rookeries; heat killing pups) -->
+    <path d="M 190 300 C 200 330, 260 360, 290 380"/>
+    <path d="M 500 300 C 500 320, 500 340, 500 340"/>
+    <path d="M 810 300 C 800 330, 740 360, 710 380"/>
+  </g>
+
+  <!-- Dashed influence lines from modifiers to the three drivers -->
+  <g stroke="#64748b" stroke-width="2" fill="none" class="dashed" marker-end="url(#arrow-muted)">
+    <path d="M 200 520 C 180 480, 190 430, 190 380"/>
+    <path d="M 500 520 C 500 480, 500 440, 500 300"/>
+    <path d="M 800 520 C 820 480, 810 430, 810 380"/>
+  </g>
+
+  <!-- Legend -->
+  <g id="legend" class="shadow">
+    <rect class="legend" x="60" y="610" width="880" height="60" rx="12"/>
+    <circle cx="88" cy="640" r="9" fill="#eef2ff" stroke="#6366f1"/>
+    <text class="text-body" x="105" y="644">Exposure</text>
+    <circle cx="220" cy="640" r="9" fill="#ecfeff" stroke="#06b6d4"/>
+    <text class="text-body" x="237" y="644">Sensitivity</text>
+    <circle cx="360" cy="640" r="9" fill="#eafff3" stroke="#22c55e"/>
+    <text class="text-body" x="377" y="644">Adaptive Capacity</text>
+    <circle cx="540" cy="640" r="9" fill="#fff7ed" stroke="#fb923c"/>
+    <text class="text-body" x="557" y="644">Cross‑cutting modifiers</text>
+    <rect x="740" y="632" width="24" height="4" fill="none" stroke="#0f172a" stroke-width="2.5"/>
+    <text class="text-body" x="770" y="644">Direct drivers</text>
+    <rect x="870" y="632" width="24" height="4" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="6 6"/>
+    <text class="text-body" x="900" y="644">Indirect/synergistic drivers</text>
+  </g>
+
+  <!-- Region note (example cues for Latin America) -->
+  <text class="muted" x="500" y="106" text-anchor="middle">Examples (LatAm mammals): manatees & river dolphins · sea lions & whales · jaguars & tapirs · bat roosts · beach rookeries · high‑Andean camelids

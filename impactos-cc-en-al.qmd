@@ -69,12 +69,16 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
       scale_fill_viridis_c(option = "C", na.value = NA) +
       theme_minimal(base_size = 11) +
       theme(panel.grid = element_blank(),
+            plot.title = element_text(size = 10, hjust = 0.5),
+            plot.subtitle=element_text(size=8, hjust=0.5),
             axis.title.x = element_blank(),
-            axis.title.y  = element_blank())
+            axis.title.y  = element_blank(),
+            legend.text = element_text(size=6),
+            legend.key.size = unit(0.5,"cm"))
      
      ggsave(outfile_png, gg, width = 8.5, height = 9.5, dpi = 300)
-    invisible(gg)
-    return(gg)
+     invisible(gg)
+     return(gg)
   }
 
   # Descarga: futuro CMIP6 y ensemble simple ----
@@ -115,70 +119,30 @@ if (!dir.exists("_data"))
 
 ## Current state of climate change effects
 
-Latin America is considered among the most **climate-vulnerable
-regions** (sharing risk with Africa, Small Island Developing States,
-South and Southeast Asia, Middle East and the Arctic), despite the
-relatively small contribution to global greenhouse gas emissions of all
-this regions.
+Latin America is considered among the most **climate-vulnerable regions** (sharing risk with Africa, Small Island Developing States, South and Southeast Asia, Middle East and the Arctic), despite the relatively small contribution to global greenhouse gas emissions of all this regions.
 
-The particular exposure of Latin America steam from a combination of
-structured factors. It is a region where climate hazards have a large
-probability to strike. This is a result of the geographical position. It
-spans the tropics, subtropics, and has an extensive coastlines, so it is
-exposed to hurricanes (Caribbean, Central America), El Niño/La
-Niña–driven droughts and floods (Pacific coast, Andes, Southern Cone),
-and heatwaves. Some sub-regions, like the tropical Andes, depend on
-glaciers as a source of water supply. There are ample sub-regions with
-low-lying coastal lands. River deltas, mangrove coastal forest and the
-Caribbean islands are clearly vulnerable to sea-level rise, storm surge
-and erosion.
+The particular exposure of Latin America steam from a combination of structured factors. It is a region where climate hazards have a large probability to strike. This is a result of the geographical position. It spans the tropics, subtropics, and has an extensive coastlines, so it is exposed to hurricanes (Caribbean, Central America), El Niño/La Niña–driven droughts and floods (Pacific coast, Andes, Southern Cone), and heatwaves. Some sub-regions, like the tropical Andes, depend on glaciers as a source of water supply. There are ample sub-regions with low-lying coastal lands. River deltas, mangrove coastal forest and the Caribbean islands are clearly vulnerable to sea-level rise, storm surge and erosion.
 
-The region is biodiversity rich. Five of the 17 megadiverse countries
-are located here: Brazil, Ecuador, Mexico, Peru and Venezuela. There are
-worldwide unique and fragile ecosystems located in the region. Some of
-them of global relevance: Amazon rainforets, Coral reefs, mangroves,
-páramo andino and tropical dry forest are widely recognized for its role
-in Holocene biosphere. The biocultural binding is strongly preserved in
-the region, making local livelihoods rely on these ecosystems for food,
-water, and raw materials.
+The region is biodiversity rich. Five of the 17 megadiverse countries are located here: Brazil, Ecuador, Mexico, Peru and Venezuela. There are worldwide unique and fragile ecosystems located in the region. Some of them of global relevance: Amazon rainforets, Coral reefs, mangroves, páramo andino and tropical dry forest are widely recognized for its role in Holocene biosphere. The biocultural binding is strongly preserved in the region, making local livelihoods rely on these ecosystems for food, water, and raw materials.
 
-But Latin America is also vulnerable because of socio-economic
-hardships. Inequity and poverty are widespread and pervasive, making
-difficult for people to cope with disasters. It is estimated that
-climate shocks push million into poverty or food insecurity. Cities grow
-through pattern of *informality*. This means that settlements are common
-to spread into floodplain, hillside or heat-prone territories. Related
-to all these, is the heavy economic and livelihood dependency on
-agriculture which makes food climate-dependent and spreads the human
-impact to wildlife and fisheries.
+But Latin America is also vulnerable because of socio-economic hardships. Inequity and poverty are widespread and pervasive, making difficult for people to cope with disasters. It is estimated that climate shocks push million into poverty or food insecurity. Cities grow through pattern of *informality*. This means that settlements are common to spread into floodplain, hillside or heat-prone territories. Related to all these, is the heavy economic and livelihood dependency on agriculture which makes food climate-dependent and spreads the human impact to wildlife and fisheries.
 
-Therefore, Latin America an the Caribbean can be regarded to have a high
-physical exposure to climate change, has a global ecological importance.
-The human population in the region has economic dependence on
-climate-sensitive sectors, and social inequality provoke a state of
-“double vulnerability”: high sensibility to the impacts of climate
-change and limited adaptive capacity. A current state of perceived
-effects can be summarized as ilustrated in @tbl-efectos. Expectations are that these effects will keep increasing. 
+Therefore, Latin America an the Caribbean can be regarded to have a high physical exposure to climate change, has a global ecological importance. The human population in the region has economic dependence on climate-sensitive sectors, and social inequality provoke a state of “double vulnerability”: high sensibility to the impacts of climate change and limited adaptive capacity. A current state of perceived effects can be summarized as ilustrated in @tbl-efectos. Expectations are that these effects will keep increasing.
 
 In paticular there is concensus that some tipping points could be near, if not already reached. For instance in the Amazon, if deforestation continues, large parts may shift to drier savanna-like systems, disrupting continental water cycles. Another wide consensus is that impacts are already visible and accelerating (heat, drought, floods, crop losses, zoonotic disease spread are increasing).
 
-
 | Concept | Identified effect |
-|----------------------|--------------------------------------------------|
+|-----------------------|-------------------------------------------------|
 | **Climate patterns** | Average temperatures have risen; heatwaves are more frequent. Rainfall patterns are shifting: some areas are drier (more droughts), others have heavier rains. |
 | **Extreme events** | Stronger and more frequent floods, droughts, wildfires, hurricanes, and intense storms. 2024 saw major hurricanes, floods, and droughts across the region. |
 | **Water resources** | Andean glaciers are retreating rapidly, reducing dry-season water supply for drinking, irrigation, and hydropower. |
 | **Ecosystems** | Amazon deforestation disrupts rainfall cycles and “flying rivers” (moisture flows). Coastal ecosystems (mangroves, reefs) suffer from sea-level rise and acidification. Species loss and species range shifts are already occurring. |
 | **Food security** | Yields are falling in some crops due to heat and rainfall variability. Fisheries are stressed by ocean warming and acidification. Extreme events increase hunger risk in vulnerable populations. |
 | **Zoonosis** | More mosquito-borne diseases (dengue, zika, chikungunya). Heatwaves raise mortality and stress health systems. Many areas lack infrastructure to cope with heat or disasters. |
-: Some effects of climate change in Latin America that  have been
-already detected {#tbl-efectos}
 
-The patterns of climate change in terms of average temperature and rainfall are shown in @fig-mapas. The base line values were calculated for the period 1970-2000. A projection to near future labeled as "2030" wzs calculated using data for the period 2021-2040.
+: Some effects of climate change in Latin America that have been already detected {#tbl-efectos}
 
-
-
-
+The patterns of climate change in terms of average temperature and rainfall are shown in @fig-mapas. The base line values were calculated for the period 1970-2000. A projection to near future labeled as "2030" was calculated using data for the period 2021-2040.
 
 ```{r}
 #| label: mapas
@@ -225,8 +189,8 @@ if (max(terra::global(tavg_base, "max", na.rm = TRUE)) > 90) {
 
 
 # Agregados anuales baseline
-tmean_base_ann <- terra::app(tavg_base, fun = mean)            # °C
-prec_base_ann  <- terra::app(prec_base, fun = sum)         # mm/año 
+tmean_base_ann <- terra::app(tavg_base, fun = mean)     # °C
+prec_base_ann  <- terra::app(prec_base, fun = sum)      # mm/año 
 
 
 
@@ -276,7 +240,7 @@ mapa1 <- plot_raster(
     value_col = names(df_dT)[3],
     title = paste0("Δ Mean annual temperature(°C)"),
     subtitle = sprintf("Scenario SSP%s vs 1970–2000; period %s",
-                       paste(models, collapse = ", "), ssp, periodo),
+                       ssp, periodo),
     legend_title = "Δ °C",
     outfile_png = file.path("_output", sprintf("latam_delta_Tmean_SSP%s_%s.png", 
                             ssp, periodo)),
@@ -288,7 +252,7 @@ mapa2 <- plot_raster(
     value_col = names(df_dP)[3],
     title = paste0("Δ Annual rainfall (%)"),
     subtitle = sprintf("Scenario SSP%s vs 1970–2000; period %s",
-                       paste(models, collapse = ", "), ssp, periodo),
+                       ssp, periodo),
     legend_title = "Δ %",
     outfile_png = file.path("_output", sprintf("latam_delta_Pann_pct_SSP%s_%s.png", 
                             ssp, periodo)),
@@ -328,15 +292,27 @@ message("Listo. Revisa la carpeta '_output' para los GeoTIFF y PNG.")
 #                            "CMIP6 2021–2040), Natural Earth")
 ```
 
-
 ```{r}
 #| label: fig-mapas
+#| fig-cap: Patterns of temperature in Latin America
 #| echo: false
 
 
 
-g1 | mapas[["245"]][[1]] / mapas[["585"]][[1]] + plot_layout(guides = 'collect')
-g2 | mapas[["245"]][[2]] / mapas[["585"]][[2]] + plot_layout(guides = 'collect')
+g1  | mapas[["245"]][[1]] / mapas[["585"]][[1]]
+
 
 
 ```
+
+
+```{r}
+#| label: fig-mapas2
+#| fig-cap: Patterns of  rainfall in Latin America
+#| echo: false
+
+g2 |  mapas[["245"]][[2]] / mapas[["585"]][[2]]
+
+```
+
+{{< include _drivers-cc-mammal-loss.qmd >}}

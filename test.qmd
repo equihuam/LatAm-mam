@@ -1,0 +1,163 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+
+```{r}
+# ---- Packages ----
+# install.packages(c("flextable","officer","dplyr"))
+library(flextable)
+library(officer)
+library(dplyr)
+library(tibble)
+
+# ---- Data (from the SVG table) ----
+drivers <- tribble(
+  ~DriverType, ~Category, ~TerrestrialExamples, ~AquaticExamples, ~Weight,  # Weight: 1..5
+  "Direct", "Temperature & heat stress",
+  "Heatwave mortality (bats, small mammals); reduced fecundity in carnivores/ungulates; den/roost overheating.",
+  "Cetacean thermoregulation stress; pup mortality in pinnipeds; range shifts to cooler waters.",
+  4,
+  "Direct", "Hydroclimatic extremes (drought/flood)",
+  "Vegetation loss → prey decline; collapse of water refuges; increased wildfire exposure; altered migration.",
+  "Reduced river discharge (river dolphins/manatees); inundation of haul-outs; flash-flood stranding.",
+  5,
+  "Direct", "Sea-level rise & cyclonic storms",
+  "Coastal refuge loss; saline intrusion into lowland forests; displacement from deltas and estuaries.",
+  "Rookery/beach loss; storm-driven pup mortality; haul-out erosion.",
+  3,
+  "Direct", "Ocean warming & acidification",
+  "—",
+  "Prey base decline & trophic mismatch; distribution shifts; altered foraging success.",
+  4,
+  "Direct", "Disease dynamics",
+  "Distemper (canids/mustelids), hantavirus in rodents; heat-facilitated parasite burdens.",
+  "Morbillivirus & toxoplasmosis in dolphins; harmful algal blooms.",
+  3,
+  "Indirect", "Habitat loss & fragmentation",
+  "Drought/fire → forest conversion; corridor loss for jaguars/tapirs; urban sprawl intensifies heat & barriers.",
+  "Mangrove/wetland loss reduces manatee shelter; coastal development blocks haul-outs.",
+  5,
+  "Indirect", "Prey-web shifts & trophic cascades",
+  "Vegetation/productivity changes reduce herbivore prey; cascading effects on carnivores; mesopredator release.",
+  "Fish stock collapse → dolphin/seal food scarcity; shifts concentrate whales near shipping lanes.",
+  4,
+  "Indirect", "Conflict & infrastructure",
+  "Drought → new dams/pipelines; roads expand with land-use change; retaliatory killing near farms.",
+  "Ports, seawalls, traffic disrupt movement; higher ship-strike & noise exposure as routes intensify.",
+  3
+)
+
+# ---- Weight rendering (filled/empty circles) ----
+weight_symbols <- function(w, maxw = 5) {
+  paste0(
+    paste(rep("\u25CF", w), collapse = ""),  # filled ●
+    paste(rep("\u25CB", maxw - w), collapse = "")  # empty ○
+  )
+}
+
+drivers <- drivers %>%
+  mutate(WeightVis = vapply(Weight, weight_symbols, character(1)))
+
+# ---- Flextable ----
+ft <- flextable(drivers)
+
+# Column labels
+ft <- set_header_labels(
+  ft,
+  DriverType = "Driver type",
+  Category = "Category",
+  TerrestrialExamples = "Terrestrial mammals – examples",
+  AquaticExamples = "Aquatic mammals – examples",
+  Weight = "Weight (1–5)",
+  WeightVis = "Weight"
+)
+
+# Hide numeric Weight (keep visual)
+#ft <- hide(ft, j = "Weight")
+
+# Title row
+ft <- add_header_row(
+  ft,
+  values = c("Direct vs Indirect Drivers of Mammal Biodiversity Threats under Climate Change"),
+  colwidths = ncol_part(ft, "header")
+)
+ft <- bold(ft, i = 1, bold = TRUE, part = "header")
+ft <- align(ft, i = 1, align = "center", part = "header")
+
+# Styling
+ft <- theme_booktabs(ft)
+ft <- fontsize(ft, size = 10, part = "body")
+ft <- fontsize(ft, size = 11, part = "header")
+ft <- align(ft, j = c("DriverType","Category","WeightVis"), align = "left", part = "body")
+ft <- valign(ft, valign = "top", part = "body")
+ft <- width(ft, j = "DriverType", width = 1.1)
+ft <- width(ft, j = "Category", width = 2.2)
+ft <- width(ft, j = "TerrestrialExamples", width = 3.6)
+ft <- width(ft, j = "AquaticExamples", width = 3.6)
+ft <- width(ft, j = "WeightVis", width = 1.1)
+ft <- autofit(ft)
+
+# Color code rows by DriverType
+col_direct_bg  <- "#EEF2FF"  # blue tint
+col_indirect_bg <- "#FFF7ED" # orange tint
+col_direct_border  <- "#6366F1"
+col_indirect_border <- "#FB923C"
+
+# Apply backgrounds
+ft <- bg(ft, i = ~ DriverType == "Direct",
+         j = c("DriverType","Category","TerrestrialExamples","AquaticExamples","WeightVis"),
+         bg = col_direct_bg)
+ft <- bg(ft, i = ~ DriverType == "Indirect",
+         j = c("DriverType","Category","TerrestrialExamples","AquaticExamples","WeightVis"),
+         bg = col_indirect_bg)
+
+# Borders (left color stripe per row)
+library(officer)
+b_none <- fp_border(color = "transparent", width = 0)
+b_direct <- fp_border(color = col_direct_border, width = 2)
+b_indirect <- fp_border(color = col_indirect_border, width = 2)
+
+# Create a thin left border for emphasis
+ft <- border(ft, i = ~ DriverType == "Direct", j = 1,
+             border.left = b_direct, border.top = b_none, border.bottom = b_none, border.right = b_none)
+ft <- border(ft, i = ~ DriverType == "Indirect", j = 1,
+             border.left = b_indirect, border.top = b_none, border.bottom = b_none, border.right = b_none)
+
+# Weight column: make circles darker and monospaced for alignment
+ft <- color(ft, j = "WeightVis", color = "#0F172A")
+ft <- fontsize(ft, j = "WeightVis", size = 12)
+ft <- font(ft, j = "WeightVis", fontname = "Courier New") # good for aligning symbols
+ft <- align(ft, j = "WeightVis", align = "center")
+
+# Header colors
+ft <- bg(ft, i = 2, bg = "#0F172A", part = "header")
+ft <- color(ft, i = 2, color = "white", part = "header")
+
+# Footnote (legend)
+legend_txt <- paste0(
+  "Legend — Row color: Direct (blue), Indirect (orange).  Weight: ",
+  "\u25CF\u25CB\u25CB\u25CB\u25CB Low, ",
+  "\u25CF\u25CF\u25CF\u25CB\u25CB Medium, ",
+  "\u25CF\u25CF\u25CF\u25CF\u25CB High, ",
+  "\u25CF\u25CF\u25CF\u25CF\u25CF Very high."
+)
+ft <- add_footer_lines(ft, values = legend_txt)
+ft <- fontsize(ft, part = "footer", size = 9)
+ft <- color(ft, part = "footer", color = "#475569")
+
+# Print in viewer
+ft
+
+# # ---- Export ----
+# # DOCX
+# save_as_docx("Mammal Vulnerability Drivers" = ft, path = "mammal_drivers_flextable.docx")
+# 
+# # HTML (for web embedding or sharing)
+# save_as_html(ft, path = "mammal_drivers_flextable.html")
+
+
+```
+
