@@ -18,7 +18,7 @@ pacman::p_load(terra, geodata)
 
 ## Introduction
 
-Climate change in Latin America is
+Climate change in Latin America
 
 Taking the Sixth Assessment Report by the IPCC [@lee2023] as an starting point, we look into the development and forecasts of climate change for Latin America and the Caribbean. In addition to the evidence reported in the assessment, the current increase in a public perception of changes is also noted. In 2019 there were over 6000 event in 185 countries (some 7.6 million participants involved), expressing concern and urging for decisive climate actions.
 

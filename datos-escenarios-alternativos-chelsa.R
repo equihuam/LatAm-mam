@@ -1,11 +1,7 @@
 # ---------- Paquetes ----------
 # install.packages(c("pastclim","terra","sf","rnaturalearth","rnaturalearthdata","tmap"))
-library(pastclim)
-library(terra)
-library(sf)
-library(rnaturalearth)
-library(rnaturalearthdata)
-library(tmap)
+pacman::p_load(pastclim, terra, sf, rnaturalearth,
+               rnaturalearthdata, tmap)
 
 # ---------- Parámetros ----------
 ssp  <- "ssp370"  # elige: "ssp126" | "ssp370" | "ssp585"
