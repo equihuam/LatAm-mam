@@ -20,9 +20,7 @@ pacman::p_load(terra, geodata)
 
 Climate change in Latin America
 
-Taking the Sixth Assessment Report by the IPCC [@lee2023] as an starting point, we look into the development and forecasts of climate change for Latin America and the Caribbean. In addition to the evidence reported in the assessment, the current increase in a public perception of changes is also noted. In 2019 there were over 6000 event in 185 countries (some 7.6 million participants involved), expressing concern and urging for decisive climate actions.
-
-This chapter explore the impacts of climate change over Latin America and the Caribbean region. It is a complex natural geographic span with a complex political structure. We found it convenient to summarize some of the proposals to characterize the region. United Nations has propose the M49 standard [@standard1999] to facilitate the consolidation of national statistical data to regional levels. According to M49 standard Latin Ameria is a region formed by three subregions: Caribbean (28 islands, spanning 15 countries), Central America (8 countries), and South America (16 countries). This regions extends over 20,139,378 km<sup>2</sup> of land. This territory is a little more than 13% of world emerged land. Moving into the see the reference to the Exclusive Economic Zone results in a total area of 140,776,000 km<sup>2</sup> (almost 40% of ocean surface)
+Taking the Sixth Assessment Report by the IPCC [@lee2023] as an starting point, we look into the development and forecasts of climate change for Latin America and the Caribbean. This chapter explore the impacts of climate change over mastofauna from  Latin America and the Caribbean region. It is a complex natural geographic span with a complex ecological and political structure. We found it convenient to summarize some of the proposals to characterize the region. United Nations has propose the M49 standard [@standard1999] to facilitate the consolidation of national statistical data to regional levels. According to M49 standard Latin America is a region formed by three subregions: Caribbean (28 islands, spanning 15 countries), Central America (8 countries), and South America (16 countries). This regions extends over 20,139,378 km<sup>2</sup> of land. This territory is a little more than 13% of world emerged land. Moving into the see the reference to the Exclusive Economic Zone results in a total area of 140,776,000 km<sup>2</sup> (almost 40% of ocean surface)
 
 
 ```{r}
@@ -35,4 +33,86 @@ mapa2 <- vect("~/1 Nubes/OneDrive - El Instituto de Ecología/America Latina y e
 #plot(test1)
 ```
 
+Align actions with IUCN NbS/EbA: protect–restore–manage habitats, reduce direct climate hazards, and address indirect human–climate synergies.
 
+Yes. You can frame Latin America’s vulnerability using the **IUCN’s ecosystem‐based framework** for climate action, which is built around the idea of **nature-based solutions (NbS)** and the **ecosystem approach** in the face of climate risk. Here’s how the assessment links:
+
+---
+
+## 1. IUCN’s ecological / ecosystem-based framework
+
+IUCN promotes an **ecosystem-based approach** to climate change, often articulated through:
+
+* **Ecosystem-based Adaptation (EbA):** Using biodiversity and ecosystem services to help people adapt to climate change (e.g., conserving forests to stabilize slopes and regulate water, restoring mangroves to protect coasts).
+* **Nature-based Solutions (NbS):** Actions to protect, sustainably manage and restore ecosystems to address societal challenges, including climate change, while providing biodiversity and human well-being benefits.
+* **Ecosystem Red List & Key Biodiversity Areas (KBA):** Tools to identify ecosystems at risk of collapse and areas of high conservation value.
+* **Protected and Conserved Areas (PCAs):** As natural infrastructure for carbon storage, adaptation, and disaster risk reduction.
+
+The framework links **exposure + sensitivity** (ecosystem condition and services) with **adaptive capacity** (governance, livelihoods, knowledge).
+
+---
+
+## 2. Linking the Latin American vulnerability drivers
+
+| Vulnerability factor (from our earlier list)       | How IUCN’s framework addresses it                                                                                                                                     |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon deforestation & tipping points**          | Classified as critical under IUCN’s **Red List of Ecosystems** (risk of collapse). NbS = forest conservation/restoration to maintain carbon sink and “flying rivers.” |
+| **Coastal exposure (Caribbean, mangroves, reefs)** | IUCN promotes **EbA/NbS** such as mangrove restoration, reef protection for coastal defense and fishery resilience.                                                   |
+| **Andean glacier retreat & water stress**          | EbA through watershed restoration, páramo/puna grassland protection to regulate flows; sustainable water governance.                                                  |
+| **Urban informality & disaster risk**              | IUCN encourages **urban NbS** (green infrastructure, wetlands restoration) to reduce flood and heat risks.                                                            |
+| **Agricultural dependence & land degradation**     | Agroforestry, shade coffee, and silvopastoral systems as NbS to increase resilience to drought/heat while storing carbon.                                             |
+| **Inequality & governance gaps**                   | Emphasizes **inclusive governance of protected/conserved areas**, indigenous and local community stewardship (key to effective EbA).                                  |
+
+---
+
+## 3. Regional priority actions (per IUCN guidance)
+
+* **Protect and restore critical ecosystems:** Amazon, mangroves, páramos, tropical dry forests, coral reefs.
+* **Scale up EbA/NbS:** Especially in **watersheds** (to secure water supply), **coastal zones** (natural storm buffers), and **urban green systems**.
+* **Integrate climate risk into protected area systems:** Strengthen their role as “natural infrastructure.”
+* **Use the Red List of Ecosystems:** To prioritize adaptation/mitigation where ecosystem collapse risk is high.
+* **Empower local & Indigenous governance:** Vital for effective, equitable adaptation.
+* **Mobilize climate finance for NbS:** Latin America has big potential but limited funding flows.
+
+---
+
+### Bottom line
+
+The **IUCN framework provides a lens to move from diagnosing vulnerability → designing nature-based, ecosystem-centered responses**.
+Latin America’s high vulnerability stems from *ecosystem degradation + social inequality + exposure to hazards*. Using NbS and EbA, protecting and restoring ecosystems, and empowering local governance are central IUCN recommendations for reducing risk and meeting both adaptation and mitigation goals.
+
+Would you like me to **turn this into a figure or table** (e.g., “Drivers of vulnerability” → “IUCN nature-based response”) for your report or presentation?
+
+
+
+| Driver type  | Category                                | Weight (Impact on mammals) | Notes / Rationale                                                                                                                                |
+| ------------ | --------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Direct**   | Temperature & heat stress               | ●●●● (High)                | Heatwaves already cause bat die-offs; endotherm limits exceeded more often; marine heat stress for cetaceans/pinnipeds.                          |
+|              | Hydroclimatic extremes (drought/flood)  | ●●●●● (Very high)          | Alters prey bases, collapses freshwater refuges; extreme drought/fire major for terrestrial; floods displace river dolphins/manatees.            |
+|              | Sea-level rise & storms                 | ●●● (Medium–high)          | Critical for coastal rookery species (pinnipeds, manatees); lower for fully inland species.                                                      |
+|              | Ocean warming & acidification           | ●●●● (High, aquatic only)  | Reshapes prey webs; whales/dolphins highly affected; no direct terrestrial impact.                                                               |
+|              | Disease dynamics                        | ●●● (Medium)               | Expanding vector/pathogen ranges; synergizes with stress & habitat change but still patchy evidence.                                             |
+| **Indirect** | Habitat loss & fragmentation            | ●●●●● (Very high)          | Climate–land-use synergy biggest driver: drought + fire → forest loss; corridors for jaguar/tapir collapse; wetland/mangrove loss hits manatees. |
+|              | Prey-web shifts & trophic cascades      | ●●●● (High)                | Productivity change cascades; marine fish decline; terrestrial herbivore loss → predator decline.                                                |
+|              | Human–wildlife conflict                 | ●●● (Medium)               | Drought drives crop raiding; retaliatory killing; whales closer to ships.                                                                        |
+|              | Infrastructure barriers                 | ●●● (Medium)               | Dams, roads, ports expand as adaptation/mitigation; important locally but uneven regionally.                                                     |
+|              | Exploitation & illegal trade            | ●●● (Medium)               | Climate-driven prey scarcity can raise hunting; economic shocks increase poaching.                                                               |
+|              | Noise & disturbance (shipping, seismic) | ●●● (Medium, aquatic)      | Climate opens new shipping routes; noise disrupts communication and migrationKey pattern
+
+Highest overall weight:
+
+Hydroclimatic extremes (drought/fire/flood) and Habitat loss & fragmentation (synergy of land-use & climate).
+
+High in oceans: Ocean warming/acidification.
+
+Growing but less quantified: Disease, conflict, infrastructure, trade, noise.
+
+How to use this weighting
+
+For a risk index, assign 1–5 points (or % of total vulnerability) per driver.
+
+For visuals, you can size or color-intensity each row/box in the existing SVG table (e.g., darker = higher weight).
+
+In an IUCN NbS/EbA planning matrix, rank interventions where high-weight drivers overlap with feasible ecosystem-based actions.. |
+
+|
