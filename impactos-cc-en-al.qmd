@@ -314,7 +314,7 @@ g1 <- plot_raster(
 g2 <- plot_raster(
   df = df_Pbase,
   value_col = names(df_Pbase)[3],
-  title = "Annual precipitation (mm) - baseline",
+  title = "Annual rainfall (mm) - baseline",
   subtitle = "WorldClim v2.1 1970–2000",
   legend_title = "mm/año",
   outfile_png = file.path("_output", "latam_Pann_baseline_1970_2000.png"),
