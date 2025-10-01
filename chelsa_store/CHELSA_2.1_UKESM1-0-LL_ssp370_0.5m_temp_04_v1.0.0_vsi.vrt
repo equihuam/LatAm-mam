@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VRTDataset rasterXSize="43200" rasterYSize="20880">
+  <Description>temperature_04</Description>
+  <Metadata>
+    <MDI key="pastclim_time_bp">false</MDI>
+  </Metadata>
+  <SRS dataAxisToSRSAxisMapping="2,1">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform> -1.8000013888885002e+02,  8.3333333000000006e-03,  0.0000000000000000e+00,  8.3999860415150010e+01,  0.0000000000000000e+00, -8.3333333000000006e-03</GeoTransform>
+  <VRTRasterBand dataType="UInt16" band="1">
+    <Description>temperature_04_2025</Description>
+    <Metadata>
+      <MDI key="time">2025</MDI>
+    </Metadata>
+    <NoDataValue>65535</NoDataValue>
+    <Offset>-273.15</Offset>
+    <Scale>0.1</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/2011-2040/UKESM1-0-LL/ssp370/tas/CHELSA_ukesm1-0-ll_r1i1p1f1_w5e5_ssp370_tas_04_2011_2040_norm.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="43200" RasterYSize="20880" DataType="UInt16" BlockXSize="43200" BlockYSize="1"/>
+      <SrcRect xOff="0" yOff="0" xSize="43200" ySize="20880"/>
+      <DstRect xOff="0" yOff="0" xSize="43200" ySize="20880"/>
+      <NODATA>65535</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="UInt16" band="2">
+    <Description>temperature_04_2055</Description>
+    <Metadata>
+      <MDI key="time">2055</MDI>
+    </Metadata>
+    <NoDataValue>65535</NoDataValue>
+    <Offset>-273.15</Offset>
+    <Scale>0.1</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/2041-2070/UKESM1-0-LL/ssp370/tas/CHELSA_ukesm1-0-ll_r1i1p1f1_w5e5_ssp370_tas_04_2041_2070_norm.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="43200" RasterYSize="20880" DataType="UInt16" BlockXSize="43200" BlockYSize="1"/>
+      <SrcRect xOff="0" yOff="0" xSize="43200" ySize="20880"/>
+      <DstRect xOff="0" yOff="0" xSize="43200" ySize="20880"/>
+      <NODATA>65535</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="UInt16" band="3">
+    <Description>temperature_04_2075</Description>
+    <Metadata>
+      <MDI key="time">2075</MDI>
+    </Metadata>
+    <NoDataValue>65535</NoDataValue>
+    <Offset>-273.15</Offset>
+    <Scale>0.1</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/2071-2100/UKESM1-0-LL/ssp370/tas/CHELSA_ukesm1-0-ll_r1i1p1f1_w5e5_ssp370_tas_04_2071_2100_norm.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="43200" RasterYSize="20880" DataType="UInt16" BlockXSize="43200" BlockYSize="1"/>
+      <SrcRect xOff="0" yOff="0" xSize="43200" ySize="20880"/>
+      <DstRect xOff="0" yOff="0" xSize="43200" ySize="20880"/>
+      <NODATA>65535</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+</VRTDataset>

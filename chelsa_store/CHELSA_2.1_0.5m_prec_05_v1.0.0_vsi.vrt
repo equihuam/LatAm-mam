@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VRTDataset rasterXSize="43200" rasterYSize="20880">
+  <Description>precipitation_05</Description>
+  <Metadata>
+    <MDI key="pastclim_time_bp">false</MDI>
+  </Metadata>
+  <SRS dataAxisToSRSAxisMapping="2,1">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform> -1.8000013888885002e+02,  8.3333333000000006e-03,  0.0000000000000000e+00,  8.3999860415150010e+01,  0.0000000000000000e+00, -8.3333333000000006e-03</GeoTransform>
+  <VRTRasterBand dataType="UInt16" band="1">
+    <Description>precipitation_05_1990</Description>
+    <Metadata>
+      <MDI key="time">1990</MDI>
+    </Metadata>
+    <NoDataValue>-2147483647</NoDataValue>
+    <Scale>0.1</Scale>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">/vsicurl/https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/pr/CHELSA_pr_05_1981-2010_V.2.1.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="43200" RasterYSize="20880" DataType="UInt16" BlockXSize="43200" BlockYSize="1"/>
+      <SrcRect xOff="0" yOff="0" xSize="43200" ySize="20880"/>
+      <DstRect xOff="0" yOff="0" xSize="43200" ySize="20880"/>
+      <NODATA>-2147483647</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+</VRTDataset>
