@@ -1,14 +1,23 @@
 ---
 title: "Climate change impacts in Latin America"
 Author: varios
-format: html
-
+format:
+  html: default
+  docx: 
+     reference-doc: custom-reference-doc.docx
 bibliography: references.bib
-
+include-in-header:
+  - text: |
+     <link rel = "shortcut icon" href = "img/ai-generated-8438225_1280.png" />
 engine: knitr
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
+#| label: setup
+
+
 pacman::p_load(terra, geodata)
 
 ```
@@ -18,7 +27,7 @@ pacman::p_load(terra, geodata)
 
 Climate change in Latin America
 
-Taking the Sixth Assessment Report by the IPCC [@lee2023] as an starting point, we look into the development and forecasts of climate change for Latin America and the Caribbean. This chapter explore the impacts of climate change over mastofauna from  Latin America and the Caribbean region. It is a complex natural geographic span with a complex ecological and political structure. We found it convenient to summarize some of the proposals to characterize the region. United Nations has propose the M49 standard [@standard1999] to facilitate the consolidation of national statistical data to regional levels. According to M49 standard Latin America is a region formed by three subregions: Caribbean (28 islands, spanning 15 countries), Central America (8 countries), and South America (16 countries). This regions extends over 20,139,378 km<sup>2</sup> of land. This territory is a little more than 13% of world emerged land. Moving into the see the reference to the Exclusive Economic Zone results in a total area of 140,776,000 km<sup>2</sup> (almost 40% of ocean surface)
+Taking the Sixth Assessment Report by the IPCC [@lee2023] as an starting point, we look into the development and forecasts of climate change for Latin America and the Caribbean. This chapter explore the impacts of climate change over mammals from  Latin America and the Caribbean region. This part of the world is a intricate natural geographic span with a complex ecological and political structure. To be specific describing the region, we adhere to the United Nations M49 standard [@standard1999] developed to facilitate the consolidation of national statistical data to regional levels. According to M49 standard Latin America is a region formed by three subregions: Caribbean (28 islands, spanning 15 countries), Central America (8 countries), and South America (16 countries). This regions extends over 20,139,378 km<sup>2</sup> of land. This territory is a little more than 13% of world emerged land. Moving into the see the reference to the Exclusive Economic Zone results in a total area of 140,776,000 km<sup>2</sup> (almost 40% of ocean surface)
 
 
 ```{r}
@@ -78,6 +87,7 @@ to_df <- function(r, aoi_sf)
 
 nice_breaks <- function(x, n = 7) pretty(x, n = n)
 
+
 plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_png, aoi_sf) 
   {
     # Si no especificas value_col, usa la primera columna que no sea x/y
@@ -86,7 +96,8 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
 
       if(grepl("temp", title)) {
         paleta <- list("inferno", 0.5, 1.0) 
-      } else paleta <- list("mako", 0.35, 0.75)
+      } else paleta <- list("turbo", 0.1, 1)
+    # scales::rescale(x, to = to, from = c(min(x, na.rm = TRUE), 1.2)
     
     gg <- ggplot() +
       geom_tile(data = df, 
@@ -115,8 +126,21 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
      invisible(gg)
      return(gg)
   }
+# #------------------------
+#   plot_raster(
+#     df = df_dP,
+#     value_col = names(df_dP)[3],
+#     title = paste0("Δ Annual rainfall (%)"),
+#     subtitle = sprintf("Scenario SSP%s vs 1970–2000; period %s",
+#                        ssp, periodo),
+#     legend_title = "Δ %",
+#     outfile_png = file.path("_output", sprintf("latam_delta_Pann_pct_SSP%s_%s.png", 
+#                             ssp, periodo)),
+#     aoi_sf = aoi
+#   )
+# #------------------------
 
-  # Descarga: futuro CMIP6 y ensemble simple ----
+# Descarga: futuro CMIP6 y ensemble simple ----
 get_future_stack <- function(var, ssp, model, periodo, res_wc) 
   {
     # var = "tn", "tm", o "prec"
@@ -162,9 +186,9 @@ The region is biodiversity rich. Five of the 17 megadiverse countries are locate
 
 But Latin America is also vulnerable because of socio-economic hardships. Inequity and poverty are widespread and pervasive, making difficult for people to cope with disasters. It is estimated that climate shocks push million into poverty or food insecurity. Cities grow through pattern of *informality*. This means that settlements are common to spread into floodplain, hillside or heat-prone territories. Related to all these, is the heavy economic and livelihood dependency on agriculture which makes food climate-dependent and spreads the human impact to wildlife and fisheries.
 
-Therefore, Latin America an the Caribbean can be regarded to have a high physical exposure to climate change, has a global ecological importance. The human population in the region has economic dependence on climate-sensitive sectors, and social inequality provoke a state of “double vulnerability”: high sensibility to the impacts of climate change and limited adaptive capacity. A current state of perceived effects can be summarized as ilustrated in @tbl-efectos. Expectations are that these effects will keep increasing.
+Therefore, Latin America an the Caribbean can be regarded to have a high physical exposure to climate change, has a global ecological importance. The human population in the region has economic dependence on climate-sensitive sectors, and social inequality provoke a state of “double vulnerability”: high sensibility to the impacts of climate change and limited adaptive capacity. A current state of perceived effects can be summarized as illustrated in @tbl-efectos. Expectations are that these effects will keep increasing.
 
-In paticular there is concensus that some tipping points could be near, if not already reached. For instance in the Amazon, if deforestation continues, large parts may shift to drier savanna-like systems, disrupting continental water cycles. Another wide consensus is that impacts are already visible and accelerating (heat, drought, floods, crop losses, zoonotic disease spread are increasing).
+In particular there is consensus that some tipping points could be near, if not already reached. For instance in the Amazon, if deforestation continues, large parts may shift to drier savanna-like systems, disrupting continental water cycles. Another wide consensus is that impacts are already visible and accelerating (heat, drought, floods, crop losses, zoonotic disease spread are increasing).
 
 | Concept | Identified effect |
 |-----------------------|-------------------------------------------------|
@@ -177,7 +201,7 @@ In paticular there is concensus that some tipping points could be near, if not a
 
 : Some effects of climate change in Latin America that have been already detected {#tbl-efectos}
 
-The patterns of climate change in terms of average temperature and rainfall are shown in @fig-mapas. The base line values were calculated for the period 1970-2000. A projection to near future labeled as "2030" was calculated using data for the period 2021-2040.
+The patterns of climate change in terms of average temperature and rainfall are shown in @fig-mapas and @fig-mapas2. The base line values were calculated for the period 1970-2000. A projection to near future labeled as "2030" was calculated using data for the period 2021-2040.
 
 ```{r}
 #| label: mapas
@@ -334,7 +358,8 @@ message("Listo. Revisa la carpeta '_output' para los GeoTIFF y PNG.")
 
 
 
-g1  | mapas[["245"]][[1]] / mapas[["585"]][[1]]
+# g1  | mapas[["245"]][[1]] / mapas[["585"]][[1]]
+g1  +  mapas[["585"]][[1]]
 
 
 
@@ -346,12 +371,24 @@ g1  | mapas[["245"]][[1]] / mapas[["585"]][[1]]
 #| fig-cap: Patterns of  rainfall in Latin America
 #| echo: false
 
-g2 |  mapas[["245"]][[2]] / mapas[["585"]][[2]]
+# g2 |  mapas[["245"]][[2]] / mapas[["585"]][[2]]
+g2 + mapas[["585"]][[2]]
 
 ```
 
 
-We are framing Latin America’s vulnerability to climate change using the **IUCN’s ecosystem typology** for climate action. In particular, IUCN has developed the *Ecosystem Red List & Key Biodiversity Areas (KBA)*, which are tools that help the identification of ecosystems at risk of collapse and areas of high conservation value. This assessment has gathered evidedne hr support the view that in Latin America an the Caribbean region particular attention should be directed to Amazon, mangroves, páramos, tropical dry forests and coral reefs. A concensus perspective is emerging suggesting that strong comitments are required to protect–restore–manage habitats, reduce direct climate hazards, and address indirect human–climate synergies (@tbl-drivers).  
+We are framing Latin America vulnerability to climate change using the **IUCN ecosystem typology** for climate action. In particular, IUCN has developed the *Ecosystem Red List & Key Biodiversity Areas (KBA)*, which are tools that help the identification of ecosystems at risk of collapse and areas of high conservation value. This assessment has gathered evidence hr support the view that in Latin America an the Caribbean region particular attention should be directed to Amazon, mangroves, páramos, tropical dry forests and coral reefs. A consensus perspective is emerging suggesting that strong commitments are required to protect–restore–manage habitats, reduce direct climate hazards, and address indirect human–climate synergies (@tbl-drivers).  
 
 {{< include _drivers-cc-mammal-loss.qmd >}}
+
+
+```{r}
+#| label: tbl-drivers
+#| tbl-cap: Main drivers of mammal biodiversity loss under current human climate change forcing.
+#| echo: false
+
+ft
+```
+
+
 

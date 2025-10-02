@@ -4,6 +4,8 @@
 .httr-oauth
 .DS_Store
 .quarto
-_data
-_output
+_data/
+_output/
 /.quarto/
+*.docx
+chelsa_store/

@@ -1,6 +1,7 @@
 
+
 ```{r}
-#| label: setup
+#| label: prep-tbl-drivers
 #| echo: false
 
 
@@ -82,15 +83,17 @@ drivers <- drivers %>%
 # ---- Flextable ----
 ft <- drivers |> 
   select(c(1:4,6)) |> 
-  flextable()
+  flextable() |> 
+  delete_columns(j = "DriverType")
   
 ft <- # Column labels
   set_header_labels(ft, 
-    DriverType = "Driver type",
+#    DriverType = "Driver type",
     Category = "Category",
     TerrestrialExamples = "Terrestrial mammals – examples",
     AquaticExamples = "Aquatic mammals – examples",
     WeightVis = "Weight") |> 
+
 
   # Title row
   add_header_row(
@@ -103,22 +106,21 @@ ft <- # Column labels
   theme_booktabs() |> 
   fontsize(size = 10, part = "body") |> 
   fontsize(size = 11, part = "header")|> 
-  align(j = c("DriverType","Category","WeightVis"), align = "left", part = "body") |> 
+  align(j = c("Category","WeightVis"), align = "left", part = "body") |> 
   valign(valign = "top", part = "body") |> 
-  width(j = "DriverType", width = 1.1) |> 
+#  width(j = "DriverType", width = 1.1) |> 
   width(j = "Category", width = 2.2) |> 
   width(j = "TerrestrialExamples", width = 3.6) |> 
   width(j = "AquaticExamples", width = 3.6) |> 
-  width(j = "WeightVis", width = 1.1) |> 
-  autofit() |> 
+  width(j = "WeightVis", width = 1.1) |>  autofit() |> 
 
   # Apply backgrounds
   bg(i = ~ DriverType == "Direct",
-           j = c("DriverType","Category","TerrestrialExamples",
+           j = c("Category","TerrestrialExamples",
                  "AquaticExamples","WeightVis"),
            bg = col_direct_bg) |> 
   bg(i = ~ DriverType == "Indirect",
-           j = c("DriverType","Category","TerrestrialExamples",
+           j = c("Category","TerrestrialExamples",
                  "AquaticExamples","WeightVis"),
            bg = col_indirect_bg) |> 
 
@@ -147,16 +149,10 @@ ft <- # Column labels
   add_footer_lines(values = legend_txt) |> 
   fontsize(part = "footer", size = 9) |> 
   color(part = "footer", color = "#475569") |> 
-  border(border = b_contorno, part = "footer")
-
-# Print in viewer
-ft
-
-# ---- Export ----
-# DOCX
-#save_as_docx("Mammal Vulnerability Drivers" = ft, path = "mammal_drivers_flextable.docx")
-
-# HTML (for web embedding or sharing)
-#save_as_html(ft, path = "mammal_drivers_flextable.html")
+  border(border = b_contorno, part = "footer") |> 
+  autofit()
 
 ```
+
+
+
