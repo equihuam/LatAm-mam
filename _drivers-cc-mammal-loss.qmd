@@ -1,7 +1,3 @@
----
-title: tabla
-format: html
----
 
 ```{r}
 #| label: setup
@@ -30,10 +26,10 @@ col_direct_border  <- "#6366F1"
 col_indirect_border <- "#FB923C"
 
 # Borders (left color stripe per row)
+b_contorno <- fp_border(color = "black", width = 2)
 b_none <- fp_border(color = "transparent", width = 0)
 b_direct <- fp_border(color = col_direct_border, width = 2)
 b_indirect <- fp_border(color = col_indirect_border, width = 2)
-
 
 # ---- Data (from the SVG table) ----
 drivers <- tribble(
@@ -118,18 +114,24 @@ ft <- # Column labels
 
   # Apply backgrounds
   bg(i = ~ DriverType == "Direct",
-           j = c("DriverType","Category","TerrestrialExamples","AquaticExamples","WeightVis"),
+           j = c("DriverType","Category","TerrestrialExamples",
+                 "AquaticExamples","WeightVis"),
            bg = col_direct_bg) |> 
   bg(i = ~ DriverType == "Indirect",
-           j = c("DriverType","Category","TerrestrialExamples","AquaticExamples","WeightVis"),
+           j = c("DriverType","Category","TerrestrialExamples",
+                 "AquaticExamples","WeightVis"),
            bg = col_indirect_bg) |> 
 
 
   # Create a thin left border for emphasis
+  border_outer(border = fp_border(color = "black", width = 2)) |> 
   border(i = ~ DriverType == "Direct", j = 1,
-               border.left = b_direct, border.top = b_none, border.bottom = b_none, border.right = b_none) |> 
+               border.left = b_direct, border.top = b_none, 
+         border.bottom = b_none, border.right = b_none) |> 
   border(i = ~ DriverType == "Indirect", j = 1,
-               border.left = b_indirect, border.top = b_none, border.bottom = b_none, border.right = b_none) |> 
+               border.left = b_indirect, border.top = b_none, 
+         border.bottom = b_none, border.right = b_none) |> 
+  hline_bottom(part = "body", border = b_contorno) |> 
 
   # Weight column: make circles darker and monospaced for alignment
   color(j = "WeightVis", color = "#0F172A") |> 
@@ -144,7 +146,8 @@ ft <- # Column labels
   # Some explanatory lines: legend
   add_footer_lines(values = legend_txt) |> 
   fontsize(part = "footer", size = 9) |> 
-  color(part = "footer", color = "#475569")
+  color(part = "footer", color = "#475569") |> 
+  border(border = b_contorno, part = "footer")
 
 # Print in viewer
 ft

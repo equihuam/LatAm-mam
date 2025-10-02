@@ -1,0 +1,189 @@
+---
+title: "biomes"
+format: html
+---
+```{r}
+
+# ---- Packages ----
+pacman::p_load("sf","dplyr","stringr","xml2","curl","readr")
+
+# ---- Output ----
+OUT_GPKG <- "latin_america_biomes.gpkg"
+
+# ---- Temp workspace ----
+td <- tempfile("get_latam_")
+dir.create(td)
+td_iucn <- file.path(td, "iucn"); dir.create(td_iucn)
+td_ne <- file.path(td, "ne"); dir.create(td_ne)
+td_eez <- file.path(td, "eez"); dir.create(td_eez)
+
+lista_f <- c("iucn", "ne", "eez")
+for (f in lista_f)
+{
+  dir.create(file.path(td, f))
+}
+
+
+
+
+# ---- Sources (Zenodo + Natural Earth + Marine Regions) ----
+ZENODO_TARBALL <- "https://zenodo.org/records/10081251/files/all-maps-vector-geojson.tar.bz2?download=1"
+ZENODO_XML     <- "https://zenodo.org/records/10081251/files/map-details.xml?download=1"
+NE_ADMIN_URL   <- "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_0_countries.zip"
+EEZ_ZIP_URL    <- "https://www.marineregions.org/downloads/World_EEZ_v12_20231025/eez_v12.zip"
+
+# ---- Download IUCN GET vector maps + map-details.xml ----
+bz_path <- file.path(td, "all-maps-vector-geojson.tar.bz2")
+curl_download(ZENODO_TARBALL, bz_path)
+utils::untar(bz_path, exdir = td_iucn, compressed = "bzip2")
+
+xml_path <- file.path(td, "map-details.xml")
+curl_download(ZENODO_XML, xml_path)
+xm <- read_xml(xml_path)
+
+# Build EFG code -> EFG name lookup from XML
+efg_nodes <- xml_find_all(xm, ".//Map")
+efg_lookup <- tibble::tibble(
+  efg_code = xml_attr(efg_nodes, "efg_code"),
+  efg_name_full = xml_text(xml_find_first(efg_nodes, "Functional_group"))
+) |>
+  mutate(
+    efg_name = ifelse(is.na(efg_name_full), efg_code,
+                      sub("^[A-Z]+\\d+\\.\\d+\\s+", "", efg_name_full))
+  ) |>
+  select(efg_code, efg_name)
+
+# replace the download+unzip with a direct GeoJSON read:
+GITHUB_GEOJSON <- "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson"
+admin <- sf::st_read(GITHUB_GEOJSON, quiet = TRUE) |>
+  sf::st_make_valid() |>
+  sf::st_transform(3857)
+
+# attribute names from this file are uppercase (e.g., SUBREGION, NAME_EN)
+lac <- admin |>
+  filter(
+    SUBREGION %in% c("South America","Central America","Caribbean") |
+      NAME_EN %in% c("Mexico","México")
+  )
+
+lac_land <- sf::st_union(sf::st_geometry(lac)) |> sf::st_cast("MULTIPOLYGON")
+
+
+# --- EEZ via WFS (no zip) ---
+EEZ_WFS <- paste0(
+  "https://geo.vliz.be/geoserver/MarineRegions/wfs?",
+  "service=WFS&version=1.0.0&request=GetFeature&",
+  "typeName=eez&outputFormat=application/json"
+)
+
+eez <- sf::st_read(EEZ_WFS, quiet = TRUE) |>
+  sf::st_transform(3857) |>
+  sf::st_make_valid()
+
+# Broad spatial filter: EEZ polygons intersecting a buffered LAC landmass
+eez_latam <- eez[st_intersects(eez, st_buffer(lac_land, 5e5), sparse = FALSE), ]
+eez_latam_union <- st_union(st_geometry(eez_latam)) |> st_cast("MULTIPOLYGON")
+
+# ---- Helper: biome name map (L2, concise labels; edit as you like) ----
+biome_name_map <- c(
+  # Terrestrial (T*)
+  "T1"="Tropical–subtropical forests", "T2"="Temperate–boreal forests & woodlands",
+  "T3"="Shrublands & shrubby woodlands", "T4"="Savannas & dry woodlands",
+  "T5"="Temperate grasslands/savannas/shrublands", "T6"="Montane grasslands & shrublands",
+  "T7"="Polar & alpine", "T8"="Flooded grasslands & savannas", "T9"="Deserts & xeric shrublands",
+  "T10"="Forested wetlands & peatlands", "T11"="Non-forest wetlands", "T12"="Ice/rock/bare",
+  "T13"="Inland saline & ephemeral", "T14"="Coastal & tidal systems",
+  "T15"="Mosaic/complex land mosaics", "T16"="Intensive land-use systems",
+  # Freshwater (F*)
+  "F1"="Rivers & streams", "F2"="Lakes", "F3"="Palustrine wetlands",
+  # Marine (M*)
+  "M1"="Coastal & shelf systems", "M2"="Oceanic pelagic", "M3"="Deep-sea benthic", "M4"="Polar marine",
+  # Subterranean / saline-transitional (common code stems that appear in GET)
+  "S1"="Subterranean karst & caves", "S2"="Subterranean groundwater",
+  "SF1"="Saline/estuarine wetlands", "SF2"="Inland saline wetlands",
+  "SM1"="Seamounts/undersea features", "MT1"="Tidal–fluvial transitional", "MT2"="Deltas & estuaries",
+  "FM1"="Floodplains & riparian"
+)
+
+# ---- Load all GeoJSONs, parse fields, clip by realm ----
+geojsons <- list.files(td_iucn, pattern = "\\.json$", recursive = TRUE, full.names = TRUE)
+message(sprintf("Found %d IUCN GET GeoJSON layers", length(geojsons)))
+
+read_one <- function(path) {
+  # Example filename: "T4.1.web.mix_v1.0.json"
+  base <- basename(path)
+  m <- str_match(base, "^([A-Z]\\d+)\\.(\\d+)")  # e.g., T4 . 1
+  if (is.na(m[1,1])) return(NULL)
+  biome_code <- m[1,2]                  # "T4"
+  efg_code   <- paste0(m[1,2], ".", m[1,3])  # "T4.1"
+  realm      <- substr(efg_code, 1, 1)  # "T" / "F" / "M" / etc.
+
+  suppressWarnings({
+    g <- tryCatch(st_read(path, quiet = TRUE), error = function(e) NULL)
+  })
+  if (is.null(g) || nrow(g) == 0) return(NULL)
+
+  g <- st_transform(g, 3857) |> st_make_valid()
+
+  # Occurrence: normalize available field (occurrence/value/class) -> major/minor
+  occ_field <- intersect(c("occurrence","value","class","VAL","val"), names(g))
+  if (length(occ_field)) {
+    occ <- g[[occ_field[1]]]
+    occ <- dplyr::recode(as.character(occ), "1"="major","2"="minor", .default="major")
+  } else {
+    occ <- "major"
+  }
+
+  g |>
+    mutate(
+      realm = realm,
+      biome_code = biome_code,
+      efg_code = efg_code,
+      efg_name = dplyr::coalesce(efg_lookup$efg_name[match(efg_code, efg_lookup$efg_code)], efg_code),
+      occurrence = occ
+    ) |>
+    select(realm, biome_code, efg_code, efg_name, occurrence, geometry)
+}
+
+# Read all layers
+g_list <- lapply(geojsons, read_one)
+g_list <- g_list[!vapply(g_list, is.null, logical(1))]
+stopifnot(length(g_list) > 0)
+
+efg_all <- do.call(rbind, g_list)
+
+# Clip by realm: marine realms to EEZ; others to land
+is_marine_realm <- efg_all$realm %in% c("M","S") # "S" can include submarine/subterranean; adjust as needed
+marine <- efg_all[is_marine_realm, ]
+terran <- efg_all[!is_marine_realm, ]
+
+if (nrow(marine)) {
+  marine <- st_intersection(st_make_valid(marine), eez_latam_union)
+}
+if (nrow(terran)) {
+  terran <- st_intersection(st_make_valid(terran), lac_land)
+}
+
+efg_latam <- rbind(terran, marine)
+efg_latam <- efg_latam |> filter(!st_is_empty(geometry)) |> st_make_valid()
+
+# Biome friendly names
+efg_latam <- efg_latam |>
+  mutate(biome_name = dplyr::coalesce(biome_name_map[biome_code], biome_code))
+
+# ---- Dissolve to L2 biomes for quick maps ----
+biomes_latam <- efg_latam |>
+  group_by(realm, biome_code, biome_name) |>
+  summarise(geometry = st_union(geometry), .groups = "drop")
+
+# ---- Write GeoPackage ----
+if (file.exists(OUT_GPKG)) file.remove(OUT_GPKG)
+st_write(st_transform(efg_latam, 4326), OUT_GPKG, "get_efg_latam", quiet = TRUE)
+st_write(st_transform(biomes_latam, 4326), OUT_GPKG, "get_biomes_latam", quiet = TRUE)
+st_write(st_transform(lac, 4326), OUT_GPKG, "countries_latam", quiet = TRUE)
+st_write(st_transform(st_as_sf(eez_latam), 4326), OUT_GPKG, "eez_latam", quiet = TRUE)
+
+message("✅ Wrote GeoPackage: ", OUT_GPKG,
+        " (layers: get_efg_latam, get_biomes_latam, countries_latam, eez_latam)")
+
+```

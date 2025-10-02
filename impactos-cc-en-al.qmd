@@ -52,8 +52,10 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
     # Si no especificas value_col, usa la primera columna que no sea x/y
     if (missing(value_col)) value_col <- setdiff(names(df), c("x","y"))[1]
     resxy <- attr(df, "resxy")
-    
-    if(grepl("temp", title)) paleta <- "C" else paleta <- "G"
+
+      if(grepl("temp", title)) {
+        paleta <- list("inferno", 0.5, 1.0) 
+      } else paleta <- list("mako", 0.35, 0.75)
     
     gg <- ggplot() +
       geom_tile(data = df, 
@@ -66,7 +68,8 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
                expand = FALSE,
                datum = NA) +                   # sin graticulado/base
       labs(title = title, subtitle = subtitle, fill = legend_title) +
-      scale_fill_viridis_c(option = "C", na.value = NA) +
+      scale_fill_viridis_c(option = paleta[[1]], na.value = NA,
+                           begin = paleta[[2]], end = paleta[[3]]) +
       theme_minimal(base_size = 11) +
       theme(panel.grid = element_blank(),
             plot.title = element_text(size = 10, hjust = 0.5),
@@ -314,5 +317,6 @@ g1  | mapas[["245"]][[1]] / mapas[["585"]][[1]]
 g2 |  mapas[["245"]][[2]] / mapas[["585"]][[2]]
 
 ```
+
 
 {{< include _drivers-cc-mammal-loss.qmd >}}

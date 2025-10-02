@@ -1,0 +1,131 @@
+---
+title: "temp-anomalies"
+format: html
+---
+
+
+
+```{r}
+# --- Packages ---
+pacman::p_load("sf","terra","dplyr","stringr","ggplot2",
+          "rnaturalearth","rnaturalearthdata","curl","R.utils")
+
+# --- Temp dirs ---
+td <- tempfile("latam_anom_"); dir.create(td, showWarnings = FALSE)
+td_ecos <- file.path(td,"ecos"); dir.create(td_ecos, FALSE)
+
+# =============================================================================
+# 1) BOUNDARIES / MASKS
+# =============================================================================
+
+# 1A. Latin America & Caribbean (LAC) using rnaturalearth
+admin <- rnaturalearth::ne_countries(scale="10m", returnclass = "sf") |> st_make_valid()
+lac <- admin |>
+  filter(subregion %in% c("South America","Central America","Caribbean") |
+           name %in% c("Mexico","México") | name_long %in% c("Mexico","México")) |>
+  st_union() |> st_as_sf() |> st_set_crs(4326)
+
+# 1B. WWF/RESOLVE ecoregions (2017) – attribute fields include REALM, BIOME_NAME, ECO_NAME
+# (official download)
+eco_zip <- file.path(td_ecos, "Ecoregions2017.zip")
+curl::curl_download("https://storage.googleapis.com/teow2016/Ecoregions2017.zip", eco_zip)
+unzip(eco_zip, exdir = td_ecos)
+eco_shp <- list.files(td_ecos, pattern = "\\.shp$", recursive = TRUE, full.names = TRUE)[1]
+eco <- st_read(eco_shp, quiet = TRUE) |> st_make_valid() |> st_transform(4326)
+
+# Restrict ecoregions to LAC footprint to keep things light
+eco_latam <- st_intersection(eco, lac)
+
+# 1C. AMAZON mask – robust basin boundary (JRC/EC “Amazonia” limit)
+# (If this URL is flaky for you, RAISG also publishes an Amazonia boundary; swap in their shapefile.)
+jrc_zip <- file.path(td, "amazon_jrc.zip")
+curl::curl_download("https://forobs.jrc.ec.europa.eu/amazon/data/amazonia_shp.zip", jrc_zip)
+unzip(jrc_zip, exdir = file.path(td,"amazon"))
+amazon_shp <- list.files(file.path(td,"amazon"), pattern="\\.shp$", full.names = TRUE)[1]
+amazon <- st_read(amazon_shp, quiet = TRUE) |> st_make_valid() |> st_transform(4326)
+
+# 1D. PÁRAMO mask – union all ecoregions whose name contains “Páramo/Paramo”
+paramo <- eco_latam |>
+  filter(str_detect(ECO_NAME, regex("P[áa]ramo", ignore_case = TRUE))) |>
+  st_union() |> st_as_sf(crs = 4326)
+
+# 1E. DRY FOREST mask – WWF biome “Tropical & Subtropical Dry Broadleaf Forests”
+dryforest <- eco_latam |>
+  filter(BIOME_NAME == "Tropical & Subtropical Dry Broadleaf Forests") |>
+  st_union() |> st_as_sf(crs = 4326)
+
+coral <- dryforest <- eco_latam |>
+  filter(BIOME_NAME == "coral") |>
+  st_union() |> st_as_sf(crs = 4326)
+
+# Ensure singlepart polygons are valid
+fix_geom <- function(sfobj) sf::st_make_valid(sfobj) |> st_cast("MULTIPOLYGON")
+lac <- fix_geom(lac); amazon <- fix_geom(amazon); paramo <- fix_geom(paramo); dryforest <- fix_geom(dryforest)
+
+# =============================================================================
+# 2) DATA: GISTEMP v4 monthly gridded anomalies (land-only, 2°×2°)
+#     Baseline is 1951–1980 (already anomalies)
+# =============================================================================
+# Source page lists the NetCDF links (land-only: 250 km smoothing).
+# If direct download fails (CDN downtime), fetch manually from the page noted below.
+gistemp_gz <- file.path(td, "gistemp250_GHCNv4.nc.gz")
+curl::curl_download("https://data.giss.nasa.gov/pub/gistemp/gistemp250_GHCNv4.nc.gz", gistemp_gz)
+nc_path <- R.utils::gunzip(gistemp_gz, remove = FALSE, overwrite = TRUE)
+
+r <- terra::rast(nc_path)            # layers = monthly anomalies
+# Weight by cell area (km^2)
+w <- terra::cellSize(r, unit = "km")
+
+# Helper: area-weighted mean anomaly for a polygon
+awm_ts <- function(poly, r, w, name){
+  m <- terra::mask(r, vect(poly))
+  w_m <- terra::mask(w, vect(poly))
+  # denominator (sum of weights over valid cells)
+  den <- as.numeric(global(w_m, "sum", na.rm = TRUE))
+  # weighted sum per layer, then divide by denom
+  num <- global(m * w_m, "sum", na.rm = TRUE)[,1]
+  vals <- as.numeric(num / den)
+  # Build date index; terra usually parses NetCDF time, fallback to monthly from 1880-01
+  tvec <- tryCatch(terra::time(r), error = function(e) NULL)
+  if (is.null(tvec) || any(is.na(tvec))) {
+    # fallback: 1880-01 mid-month start
+    start <- as.Date("1880-01-15")
+    tvec <- seq.Date(start, by = "1 month", length.out = nlyr(r))
+  } else {
+    tvec <- as.Date(tvec)
+  }
+  tibble::tibble(region = name, date = tvec, anomaly = vals)
+}
+
+ts_lac     <- awm_ts(lac, r, w, "Latin America")
+ts_amazon  <- awm_ts(amazon, r, w, "Amazon")
+ts_paramo  <- awm_ts(paramo, r, w, "P\u00E1ramo")
+ts_dry     <- awm_ts(dryforest, r, w, "Dry forest")
+
+ts_all <- dplyr::bind_rows(ts_lac, ts_amazon, ts_paramo, ts_dry)
+
+# Annual means (calendar year)
+ts_annual <- ts_all |>
+  mutate(year = as.integer(format(date, "%Y"))) |>
+  group_by(region, year) |>
+  summarise(anomaly = mean(anomaly, na.rm = TRUE), .groups = "drop")
+
+# =============================================================================
+# 3) PLOT
+# =============================================================================
+library(ggplot2)
+gg <- ggplot(ts_annual, aes(x = year, y = anomaly, color = region)) +
+  geom_hline(yintercept = 0, linewidth = 0.4, linetype = "dashed") +
+  geom_line(linewidth = 1) +
+  labs(title = "Temperature anomaly (1951–1980 baseline)",
+       subtitle = "Area-weighted annual means (GISTEMP v4, 2°×2° land-only)\nLatin America vs. Amazon, Páramo, and Tropical Dry Forests",
+       x = NULL, y = "Anomaly (°C)", color = NULL,
+       caption = "Data: NASA GISTEMP v4; Boundaries: RESOLVE/WWF ecoregions (2017), JRC Amazon; Countries: Natural Earth") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+print(gg)
+
+
+```
+
+
