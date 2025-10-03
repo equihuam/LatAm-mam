@@ -9,3 +9,11 @@ _output/
 /.quarto/
 *.docx
 chelsa_store/
+# R-specific files
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
+# Temporary files or directories
+rdatatemp/
+.RDataTmp

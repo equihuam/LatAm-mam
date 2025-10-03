@@ -1,17 +1,16 @@
----
-title: "temp-anomalies"
-format: html
----
-
 
 
 ```{r}
+#| label: anomalias
+#| echo: false
+
+
 # --- Packages ---
 pacman::p_load("sf","terra","dplyr","stringr","ggplot2",
-          "rnaturalearth","rnaturalearthdata","curl","R.utils")
+          "rnaturalearth","rnaturalearthdata","curl","R.utils", "tidyr")
 
 # --- Temp dirs ---
-td <- tempfile("latam_anom_"); dir.create(td, showWarnings = FALSE)
+td <-  "_data/"  # tempfile("latam_anom_"); dir.create(td, showWarnings = FALSE)
 td_ecos <- file.path(td,"ecos"); dir.create(td_ecos, FALSE)
 
 # =============================================================================
@@ -19,7 +18,8 @@ td_ecos <- file.path(td,"ecos"); dir.create(td_ecos, FALSE)
 # =============================================================================
 
 # 1A. Latin America & Caribbean (LAC) using rnaturalearth
-admin <- rnaturalearth::ne_countries(scale="10m", returnclass = "sf") |> st_make_valid()
+admin <- rnaturalearth::ne_countries(scale = 10, returnclass = "sf") |> 
+  st_make_valid()
 lac <- admin |>
   filter(subregion %in% c("South America","Central America","Caribbean") |
            name %in% c("Mexico","México") | name_long %in% c("Mexico","México")) |>
@@ -30,19 +30,53 @@ lac <- admin |>
 eco_zip <- file.path(td_ecos, "Ecoregions2017.zip")
 curl::curl_download("https://storage.googleapis.com/teow2016/Ecoregions2017.zip", eco_zip)
 unzip(eco_zip, exdir = td_ecos)
+
 eco_shp <- list.files(td_ecos, pattern = "\\.shp$", recursive = TRUE, full.names = TRUE)[1]
 eco <- st_read(eco_shp, quiet = TRUE) |> st_make_valid() |> st_transform(4326)
 
 # Restrict ecoregions to LAC footprint to keep things light
 eco_latam <- st_intersection(eco, lac)
 
-# 1C. AMAZON mask – robust basin boundary (JRC/EC “Amazonia” limit)
-# (If this URL is flaky for you, RAISG also publishes an Amazonia boundary; swap in their shapefile.)
-jrc_zip <- file.path(td, "amazon_jrc.zip")
-curl::curl_download("https://forobs.jrc.ec.europa.eu/amazon/data/amazonia_shp.zip", jrc_zip)
-unzip(jrc_zip, exdir = file.path(td,"amazon"))
-amazon_shp <- list.files(file.path(td,"amazon"), pattern="\\.shp$", full.names = TRUE)[1]
-amazon <- st_read(amazon_shp, quiet = TRUE) |> st_make_valid() |> st_transform(4326)
+# --- Amazonía (hidrográfica) desde HydroBASINS (Nivel 5) ---
+# Fuente: HydroBASINS, continente SA. (Si prefieres otro nivel, cambia 'lev05' por 'lev04' o 'lev06'.)
+hb_zip <- file.path(td, "hybas_sa_lev01-12_v1c.zip")
+hb_dir <- file.path(td, "Amazon"); dir.create(hb_dir, showWarnings = FALSE)
+
+curl::curl_download("https://data.hydrosheds.org/file/hydrobasins/standard/hybas_sa_lev01-12_v1c.zip", hb_zip)
+utils::unzip(hb_zip, exdir = hb_dir)
+
+hb_shp <- list.files(hb_dir, pattern = "lev05_v1c\\.shp$", full.names = TRUE)[1]
+hb <- st_read(hb_shp, quiet = TRUE) |> st_make_valid() |> st_transform(4326)
+
+# Punto cerca de la desembocadura del Amazonas (Amapá, Brasil)
+mouth <- st_sfc(st_point(c(-50.5, -1.5)), crs = 4326)
+
+# Subcuenca más cercana; obtenemos su MAIN_BAS (id de cuenca principal)
+idx <- st_nearest_feature(mouth, hb)
+amazon_main <- hb$MAIN_BAS[idx]
+
+# Unimos TODAS las subcuencas con ese MAIN_BAS -> cuenca amazónica completa
+amazon <- hb |>
+  filter(MAIN_BAS == amazon_main) |>
+  summarise(geometry = st_union(geometry)) |>
+  st_make_valid() |>
+  st_cast("MULTIPOLYGON")
+
+# (Opcional) Guardar a disco para reutilizar
+# sf::st_write(amazon, "amazon_hydrobasins.gpkg", "amazon_basin", delete_dsn = TRUE)
+
+
+# ------------------------------
+# # 1C. AMAZON mask – robust basin boundary (JRC/EC “Amazonia” limit)
+# # (If this URL is flaky for you, RAISG also publishes an Amazonia boundary; swap in their shapefile.)
+# jrc_zip <- file.path(td, "amazon_jrc.zip")
+# curl::curl_download("https://forobs.jrc.ec.europa.eu/amazon/data/amazonia_shp.zip", jrc_zip)
+# unzip(jrc_zip, exdir = file.path(td,"amazon"))
+# 
+# amazon_shp <- list.files(file.path(td,"amazon"), pattern="\\.shp$", full.names = TRUE)[1]
+# amazon <- st_read(amazon_shp, quiet = TRUE) |> st_make_valid() |> st_transform(4326)
+# --------------------------
+  
 
 # 1D. PÁRAMO mask – union all ecoregions whose name contains “Páramo/Paramo”
 paramo <- eco_latam |>
@@ -54,13 +88,17 @@ dryforest <- eco_latam |>
   filter(BIOME_NAME == "Tropical & Subtropical Dry Broadleaf Forests") |>
   st_union() |> st_as_sf(crs = 4326)
 
-coral <- dryforest <- eco_latam |>
+coral <- eco_latam |>
   filter(BIOME_NAME == "coral") |>
   st_union() |> st_as_sf(crs = 4326)
 
 # Ensure singlepart polygons are valid
 fix_geom <- function(sfobj) sf::st_make_valid(sfobj) |> st_cast("MULTIPOLYGON")
-lac <- fix_geom(lac); amazon <- fix_geom(amazon); paramo <- fix_geom(paramo); dryforest <- fix_geom(dryforest)
+lac <- fix_geom(lac); 
+amazon <- fix_geom(amazon); 
+paramo <- fix_geom(paramo); 
+dryforest <- fix_geom(dryforest)
+#coral <- fix_geom(coral)
 
 # =============================================================================
 # 2) DATA: GISTEMP v4 monthly gridded anomalies (land-only, 2°×2°)
@@ -94,26 +132,27 @@ awm_ts <- function(poly, r, w, name){
   } else {
     tvec <- as.Date(tvec)
   }
-  tibble::tibble(region = name, date = tvec, anomaly = vals)
+  tibble(region = name, date = tvec, anomaly = vals)
 }
 
-ts_lac     <- awm_ts(lac, r, w, "Latin America")
+ts_lac     <- awm_ts(lac, r, w, "Latin America") 
 ts_amazon  <- awm_ts(amazon, r, w, "Amazon")
 ts_paramo  <- awm_ts(paramo, r, w, "P\u00E1ramo")
 ts_dry     <- awm_ts(dryforest, r, w, "Dry forest")
+#coral      <- awm_ts(coral, r, w, "Coral reefs")
 
-ts_all <- dplyr::bind_rows(ts_lac, ts_amazon, ts_paramo, ts_dry)
+ts_all <- bind_rows(ts_lac, ts_amazon, ts_paramo, ts_dry) 
 
 # Annual means (calendar year)
 ts_annual <- ts_all |>
   mutate(year = as.integer(format(date, "%Y"))) |>
   group_by(region, year) |>
-  summarise(anomaly = mean(anomaly, na.rm = TRUE), .groups = "drop")
+  summarise(anomaly = mean(anomaly, na.rm = TRUE), .groups = "drop") |> 
+  drop_na()
 
 # =============================================================================
 # 3) PLOT
 # =============================================================================
-library(ggplot2)
 gg <- ggplot(ts_annual, aes(x = year, y = anomaly, color = region)) +
   geom_hline(yintercept = 0, linewidth = 0.4, linetype = "dashed") +
   geom_line(linewidth = 1) +
@@ -123,9 +162,33 @@ gg <- ggplot(ts_annual, aes(x = year, y = anomaly, color = region)) +
        caption = "Data: NASA GISTEMP v4; Boundaries: RESOLVE/WWF ecoregions (2017), JRC Amazon; Countries: Natural Earth") +
   theme_minimal(base_size = 12) +
   theme(legend.position = "bottom")
-print(gg)
-
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

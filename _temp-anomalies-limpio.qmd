@@ -1,0 +1,95 @@
+# ==== Paquetes ====
+pkgs <- c("sf","terra","dplyr","stringr","ggplot2","rnaturalearth","rnaturalearthdata","curl","R.utils")
+to_install <- setdiff(pkgs, rownames(installed.packages()))
+if (length(to_install)) install.packages(to_install, repos = "https://cloud.r-project.org")
+invisible(lapply(pkgs, library, character.only = TRUE))
+
+# ==== Salida ====
+OUT_PNG <- "latam_anomalies_gistemp.png"
+
+# ==== 1) Máscaras espaciales (LAC, Amazonía, Páramo, Bosque seco) ====
+# Países LAC
+admin <- rnaturalearth::ne_countries(scale="10m", returnclass="sf") |> sf::st_make_valid()
+lac <- admin |>
+  dplyr::filter(subregion %in% c("South America","Central America","Caribbean") |
+                  name %in% c("Mexico","México") | name_long %in% c("Mexico","México")) |>
+  sf::st_union() |> sf::st_as_sf() |> sf::st_set_crs(4326)
+
+# Ecorregiones WWF/RESOLVE 2017 (para Páramo y Bosque seco)
+td_ecos <- tempfile("ecos"); dir.create(td_ecos)
+eco_zip <- file.path(td_ecos, "Ecoregions2017.zip")
+curl::curl_download("https://storage.googleapis.com/teow2016/Ecoregions2017.zip", eco_zip)
+utils::unzip(eco_zip, exdir = td_ecos)
+eco_shp <- list.files(td_ecos, pattern="\\.shp$", recursive=TRUE, full.names=TRUE)[1]
+eco <- sf::st_read(eco_shp, quiet=TRUE) |> sf::st_make_valid() |> sf::st_transform(4326)
+eco_latam <- sf::st_intersection(eco, lac)
+
+# Amazonía (JRC)
+td_amz <- tempfile("amazon"); dir.create(td_amz)
+amz_zip <- file.path(td_amz, "amazon_jrc.zip")
+curl::curl_download("https://forobs.jrc.ec.europa.eu/amazon/data/amazonia_shp.zip", amz_zip)
+utils::unzip(amz_zip, exdir = td_amz)
+amazon_shp <- list.files(td_amz, pattern="\\.shp$", full.names=TRUE)[1]
+amazon <- sf::st_read(amazon_shp, quiet=TRUE) |> sf::st_make_valid() |> sf::st_transform(4326)
+
+# Páramo (por nombre de ecorregión)
+paramo <- eco_latam |>
+  dplyr::filter(stringr::str_detect(ECO_NAME, stringr::regex("P[áa]ramo", ignore_case=TRUE))) |>
+  sf::st_union() |> sf::st_as_sf(crs=4326)
+
+# Bosque seco (bioma WWF)
+dryforest <- eco_latam |>
+  dplyr::filter(BIOME_NAME == "Tropical & Subtropical Dry Broadleaf Forests") |>
+  sf::st_union() |> sf::st_as_sf(crs=4326)
+
+# Limpieza formas
+fix_geom <- function(x) sf::st_make_valid(x) |> sf::st_cast("MULTIPOLYGON")
+lac <- fix_geom(lac); amazon <- fix_geom(amazon); paramo <- fix_geom(paramo); dryforest <- fix_geom(dryforest)
+
+# ==== 2) Datos: GISTEMP v4 mensual (anomalías, rejilla 2°×2°, baseline 1951–1980) ====
+td <- tempfile("gistemp"); dir.create(td)
+gz_nc <- file.path(td, "gistemp250_GHCNv4.nc.gz")
+# Land-only, 250 km smoothing; si falla, reintenta con user-agent
+h <- curl::new_handle(); curl::handle_setheaders(h, "User-Agent"="Mozilla/5.0")
+tryCatch(
+  curl::curl_download("https://data.giss.nasa.gov/pub/gistemp/gistemp250_GHCNv4.nc.gz", gz_nc, handle=h),
+  error=function(e) stop("No se pudo descargar GISTEMP v4: ", e$message)
+)
+nc <- R.utils::gunzip(gz_nc, overwrite=TRUE, remove=FALSE)
+r <- terra::rast(nc)                # capas mensuales de anomalía (°C)
+w <- terra::cellSize(r, unit="km")  # pesos por área
+
+# ==== 3) Promedios ponderados por área y agregación anual ====
+awm_ts <- function(poly, r, w, name){
+  m <- terra::mask(r, terra::vect(poly))
+  w_m <- terra::mask(w, terra::vect(poly))
+  den <- as.numeric(global(w_m, "sum", na.rm=TRUE))
+  num <- global(m * w_m, "sum", na.rm=TRUE)[,1]
+  vals <- as.numeric(num / den)
+  tvec <- tryCatch(terra::time(r), error=function(e) NULL)
+  if (is.null(tvec) || any(is.na(tvec))) {
+    start <- as.Date("1880-01-15"); tvec <- seq.Date(start, by="1 month", length.out=nlyr(r))
+  } else tvec <- as.Date(tvec)
+  tibble::tibble(region=name, date=tvec, anomaly=vals)
+}
+
+ts_lac    <- awm_ts(lac, r, w, "América Latina")
+ts_amz    <- awm_ts(amazon, r, w, "Amazonía")
+ts_paramo <- awm_ts(paramo, r, w, "Páramo")
+ts_dry    <- awm_ts(dryforest, r, w, "Bosque seco")
+
+ts_all <- dplyr::bind_rows(ts_lac, ts_amz, ts_paramo, ts_dry)
+ts_annual <- ts_all |>
+  dplyr::mutate(year = as.integer(format(date, "%Y"))) |>
+  dplyr::group_by(region, year) |>
+  dplyr::summarise(anomaly = mean(anomaly, na.rm=TRUE), .groups="drop")
+
+# ==== 4) Gráfico (PNG) ====
+gg <- ggplot2::ggplot(ts_annual, aes(x=year, y=anomaly, color=region)) +
+  ggplot2::geom_hline(yintercept=0, linewidth=0.4, linetype="dashed") +
+  ggplot2::geom_line(linewidth=1) +
+  ggplot2::labs(
+    title = "Anomalía de temperatura (base 1951–1980)",
+    subtitle = "Promedios anuales ponderados por área (GISTEMP v4, 2°×2°; tierra)\nAmérica Latina vs Amazonía, Páramo y Bosque seco",
+    x = NULL, y = "Anomalía (°C)", color = NULL,
+    caption = "Datos: NASA GISTEMP v4; Máscaras: WWF/RESOLVE (20
