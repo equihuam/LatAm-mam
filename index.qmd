@@ -16,36 +16,6 @@ editor_options:
 
 ```{r}
 #| label: setup
-
-
-pacman::p_load(terra, geodata)
-
-```
-
-
-## Introduction
-
-Climate change in Latin America
-
-Taking the Sixth Assessment Report by the IPCC [@lee2023] as an starting point, we look into the development and forecasts of climate change for Latin America and the Caribbean. This chapter explore the impacts of climate change over mammals from  Latin America and the Caribbean region. This part of the world is a intricate natural geographic span with a complex ecological and political structure. To be specific describing the region, we adhere to the United Nations M49 standard [@standard1999] developed to facilitate the consolidation of national statistical data to regional levels. According to M49 standard Latin America is a region formed by three subregions: Caribbean (28 islands, spanning 15 countries), Central America (8 countries), and South America (16 countries). This regions extends over 20,139,378 km<sup>2</sup> of land. This territory is a little more than 13% of world emerged land. Moving into the see the reference to the Exclusive Economic Zone results in a total area of 140,776,000 km<sup>2</sup> (almost 40% of ocean surface)
-
-
-```{r}
-mapa <- vect("~/1 Nubes/OneDrive - El Instituto de Ecología/America Latina y el Caribe/america_latina_caribe_eez_v12.gpkg")
-plot(mapa, values = mapa$GEONAME, legend = F)
-
-mapa2 <- vect("~/1 Nubes/OneDrive - El Instituto de Ecología/America Latina y el Caribe/Morrone_Provincias_Biogeograficas/America Latina y Caribe.shp")
-
-#test1 <- terra::(mapa, mapa2)
-#plot(test1)
-```
-
-
- 
-
-
-```{r}
-#| label: inicial
 #| echo: false
 #| message: false
 #| warning: false
@@ -68,11 +38,11 @@ mapa2 <- vect("~/1 Nubes/OneDrive - El Instituto de Ecología/America Latina y e
 # Bibliotecas
 pacman::p_load("terra", "sf", "geodata", "rnaturalearth", 
                "rnaturalearthdata", "ggplot2", "dplyr", 
-               "purrr", "stringr",
+               "purrr", "stringr", "RColorBrewer",
                "patchwork")
 
 
-# Funciones auxiliares ----
+     # Funciones auxiliares ----
 to_df <- function(r, aoi_sf) 
   {
     # Recorta y enmascara al AOI, convierte a data.frame para ggplot
@@ -81,7 +51,7 @@ to_df <- function(r, aoi_sf)
     
       df <- as.data.frame(r1, xy = TRUE, na.rm = TRUE)
     
-    attr(df, "resxy") <- terra::res(r1)  # guarda tamaño del píxel (lon/lat en grados)
+    attr(df, "resxy") <- res(r1)  # guarda tamaño del píxel (lon/lat en grados)
     return(df)
   }
 
@@ -94,7 +64,7 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
     if (missing(value_col)) value_col <- setdiff(names(df), c("x","y"))[1]
     resxy <- attr(df, "resxy")
 
-      if(grepl("temp", title)) {
+      if (grepl("temp", title)) {
         paleta <- list("inferno", 0.5, 1.0) 
       } else paleta <- list("turbo", 0.1, 1)
     gg <- ggplot() +
@@ -103,8 +73,8 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
                 width  = resxy[1],     # ancho del píxel en grados
                 height = resxy[2]) +   # alto del píxel en grados
       geom_sf(data = aoi_sf, fill = NA, color = "grey20", linewidth = 0.2) +
-      coord_sf(crs = sf::st_crs(4326),         # == CRS de los datos → NO reproyecta
-               default_crs = sf::st_crs(4326), # para capas sin CRS explícito
+      coord_sf(crs = st_crs(4326),         # == CRS de los datos → NO reproyecta
+               default_crs = st_crs(4326), # para capas sin CRS explícito
                expand = FALSE,
                datum = NA) +                   # sin graticulado/base
       labs(title = title, subtitle = subtitle, fill = legend_title) +
@@ -113,14 +83,14 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
       theme_minimal(base_size = 11) +
       theme(panel.grid = element_blank(),
             plot.title = element_text(size = 10, hjust = 0.5),
-            plot.subtitle=element_text(size=8, hjust=0.5),
+            plot.subtitle = element_text(size = 8, hjust = 0.5),
             axis.title.x = element_blank(),
             axis.title.y  = element_blank(),
-            legend.text = element_text(size=6),
+            legend.text = element_text(size = 6),
             legend.key.size = unit(0.5,"cm"))
      
-     ggsave(outfile_png, gg, width = 8.5, height = 9.5, dpi = 300)
-     saveRDS(gg, file = str_replace(outfile_png, pattern = "png$", replacement = "rds")) 
+     # ggsave(outfile_png, gg, width = 8.5, height = 9.5, dpi = 300)
+     # saveRDS(gg, file = str_replace(outfile_png, pattern = "png$", replacement = "rds")) 
      invisible(gg)
      return(gg)
   }
@@ -142,7 +112,7 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
 get_future_stack <- function(var, ssp, model, periodo, res_wc) 
   {
     # var = "tn", "tm", o "prec"
-    geodata::cmip6_world(var = var, res = res_wc, ssp = ssp,
+    cmip6_world(var = var, res = res_wc, ssp = ssp,
                          model = model, time = periodo, path = "_data")
 }
 
@@ -151,17 +121,17 @@ get_future_stack <- function(var, ssp, model, periodo, res_wc)
 build_ensemble <- function(var, ssp) 
   {
     message(sprintf("Descargando futuro %s, SSP%s ...", var, ssp))
-    stacks <- purrr::map(models, ~ get_future_stack(var, ssp, .x, periodo, res_wc))
+    stacks <- map(models, ~ get_future_stack(var, ssp, .x, periodo, res_wc))
     # Asegurar orden de capas y dimensiones
     # (cada stack trae 12 meses)
-    s <- terra::sprc(stacks) |> terra::mosaic() # unión espacial segura
+    s <- sprc(stacks) |> mosaic() # unión espacial segura
     # Promedio sobre modelos: apilamos por capa mensual (12 capas), luego mean
     # Para evitar problemas, calculamos mean por capa índice:
-    layers <- seq_len(terra::nlyr(stacks[[1]]))
+    layers <- seq_len(nlyr(stacks[[1]]))
     mean_months <- lapply(layers, function(i) {
-      terra::mean(terra::rast(purrr::map(stacks, ~ .x[[i]])))
+      mean(rast(map(stacks, ~ .x[[i]])))
     })
-    terra::rast(mean_months)
+    rast(mean_months)
   }
 
 
@@ -174,32 +144,148 @@ if (!dir.exists("_data"))
 
 ```
 
+## Introduction
+
+Climate change in Latin America
+
+Taking the Sixth Assessment Report by the IPCC [@lee2023] as an starting
+point, we look into the development and forecasts of climate change for
+Latin America and the Caribbean. This chapter explore the impacts of
+climate change over mammals from Latin America and the Caribbean region.
+This part of the world is a intricate natural geographic span with a
+complex ecological and political structure. To be specific describing
+the region, we adhere to the United Nations M49 standard [@standard1999]
+developed to facilitate the consolidation of national statistical data
+to regional levels. According to M49 standard Latin America is a region
+formed by three subregions: Caribbean (28 islands, spanning 15
+countries), Central America (8 countries), and South America (16
+countries). This regions extends over 20,139,378 km<sup>2</sup> of land.
+This territory is a little more than 13% of world emerged land. Moving
+into the see the reference to the Exclusive Economic Zone results in a
+total area of 140,776,000 km<sup>2</sup> (almost 40% of ocean surface).
+
+Ecologicaly, the region spans 16 biome types, according to the *IUCN
+Global Ecosystem Typology* [@keith2022; \@keith2020]. This framework is
+comprehensive, and includes subterranean ecosystems. The map is
+ilustrative of them in the region, the legend accounts for all of them,
+but some may not be represented or overlap. Despite this representation
+limitations, the map gives a good account of the ecosystemic complexity
+of the region. (\@fig-biomes)
+
+\
+
+```{r}
+#| label: fig-biomes
+#| fig-cap: Biomes occurring in Latin America and the Caribbean according to the IUCN Global Ecosystem Typology.
+#| echo: false
+
+# If you already ran the previous script, you should have latin_america_biomes.gpkg
+# This draws the Level-2 Functional Biomes dissolved layer (plus countries & EEZ)
+gpkg <- "~/1 Nubes/OneDrive - El Instituto de Ecología/America Latina y el Caribe/cambio climáico/latin_america_biomes.gpkg"   # path to the file you generated
+biomes    <- st_read(gpkg, layer = "get_biomes_latam", quiet = TRUE)
+countries <- st_read(gpkg, layer = "countries_latam", quiet = TRUE)
+eez       <- st_read(gpkg, layer = "eez_latam", quiet = TRUE)
+
+colors_lst <- data.frame(biomes = unique(biomes$biome_name), 
+                     color = c("#5DADE2", "#3498DB", "#76D7C4", "#53EAFD",
+                               "#2B7FFF", "#1565C0", "#ECEFF1", "#607D8B",
+                               "#616161", "#66BB6A", "#1B5E20", "#8D6E63",
+                               "#FFCA28", "#CDDC39", "#CE93D8", "#D7BDE2"))
+
+ggplot() +
+  geom_sf(data = eez, fill = NA,
+          linewidth = 0.2, alpha = 0.7) +
+  geom_sf(data = biomes, aes(fill = biome_name), 
+          linewidth = 0.05, alpha = 0.9) +
+  geom_sf(data = countries, fill = NA, linewidth = 0.2, color = "black") +
+  coord_sf(xlim = c(-120, -30), ylim = c(-60, 33), expand = FALSE) +
+  labs(title = "Latin America & Caribbean",
+       subtitle = "IUCN Global Ecosystem Typology",
+       fill = "Biome (L2)") +
+  scale_fill_manual(values = colors_lst$color) +
+  theme_minimal() +
+  theme(legend.position = "right",
+        legend.text = element_text(size = 6),
+        legend.key.size = unit(0.3,"cm"))
+
+```
+
+\
+
 ## Current state of climate change effects
 
-Latin America is considered among the most **climate-vulnerable regions** (sharing risk with Africa, Small Island Developing States, South and Southeast Asia, Middle East and the Arctic), despite the relatively small contribution to global greenhouse gas emissions of all this regions.
+Latin America is considered among the most **climate-vulnerable
+regions** (sharing risk with Africa, Small Island Developing States,
+South and Southeast Asia, Middle East and the Arctic), despite the
+relatively small contribution to global greenhouse gas emissions of all
+these regions.
 
-The particular exposure of Latin America steam from a combination of structured factors. It is a region where climate hazards have a large probability to strike. This is a result of the geographical position. It spans the tropics, subtropics, and has an extensive coastlines, so it is exposed to hurricanes (Caribbean, Central America), El Niño/La Niña–driven droughts and floods (Pacific coast, Andes, Southern Cone), and heatwaves. Some sub-regions, like the tropical Andes, depend on glaciers as a source of water supply. There are ample sub-regions with low-lying coastal lands. River deltas, mangrove coastal forest and the Caribbean islands are clearly vulnerable to sea-level rise, storm surge and erosion.
+The particular exposure of Latin America steam from a combination of
+structured factors. It is a region where climate hazards have a large
+probability to strike. This is a result of the geographical position. It
+spans the tropics, subtropics, and has an extensive coastlines, so it is
+exposed to hurricanes (Caribbean, Central America), El Niño/La
+Niña–driven droughts and floods (Pacific coast, Andes, Southern Cone),
+and heatwaves. Some sub-regions, like the tropical Andes, depend on
+glaciers as a source of water supply. There are ample sub-regions with
+low-lying coastal lands. River deltas, mangrove coastal forest and the
+Caribbean islands are clearly vulnerable to sea-level rise, storm surge
+and erosion.
 
-The region is biodiversity rich. Five of the 17 megadiverse countries are located here: Brazil, Ecuador, Mexico, Peru and Venezuela. There are worldwide unique and fragile ecosystems located in the region. Some of them of global relevance: Amazon rainforets, Coral reefs, mangroves, páramo andino and tropical dry forest are widely recognized for its role in Holocene biosphere. The biocultural binding is strongly preserved in the region, making local livelihoods rely on these ecosystems for food, water, and raw materials.
+The region is biodiversity rich. Five of the 17 megadiverse countries
+are located here: Brazil, Ecuador, Mexico, Peru and Venezuela. There are
+worldwide unique and fragile ecosystems located in the region. Some of
+them of global relevance: Amazon rainforets, Coral reefs, mangroves,
+páramo andino and tropical dry forest are widely recognized for its role
+in Holocene biosphere. The biocultural binding is strongly preserved in
+the region, making local livelihoods rely on these ecosystems for food,
+water, and raw materials.
 
-But Latin America is also vulnerable because of socio-economic hardships. Inequity and poverty are widespread and pervasive, making difficult for people to cope with disasters. It is estimated that climate shocks push million into poverty or food insecurity. Cities grow through pattern of *informality*. This means that settlements are common to spread into floodplain, hillside or heat-prone territories. Related to all these, is the heavy economic and livelihood dependency on agriculture which makes food climate-dependent and spreads the human impact to wildlife and fisheries.
+But Latin America is also vulnerable because of socio-economic
+hardships. Inequity and poverty are widespread and pervasive, making
+difficult for people to cope with disasters. It is estimated that
+climate shocks push million into poverty or food insecurity. Cities grow
+through pattern of *informality*. This means that settlements are common
+to spread into floodplain, hillside or heat-prone territories. Related
+to all these, is the heavy economic and livelihood dependency on
+agriculture which makes food climate-dependent and spreads the human
+impact to wildlife and fisheries.
 
-Therefore, Latin America an the Caribbean can be regarded to have a high physical exposure to climate change, has a global ecological importance. The human population in the region has economic dependence on climate-sensitive sectors, and social inequality provoke a state of “double vulnerability”: high sensibility to the impacts of climate change and limited adaptive capacity. A current state of perceived effects can be summarized as illustrated in @tbl-efectos. Expectations are that these effects will keep increasing.
+Therefore, Latin America an the Caribbean can be regarded to have a high
+physical exposure to climate change, while it has a global ecological
+importance. The human population in the region has economic dependence
+on climate-sensitive sectors, and social inequality provoke a state of
+“double vulnerability”: high sensibility to the impacts of climate
+change and limited adaptive capacity. A current state of perceived
+effects can be summarized as illustrated in @tbl-efectos. Expectations
+are that these effects will keep increasing. In particular there is
+consensus that some tipping points could be near, if not already
+reached. For instance in the Amazon, if deforestation continues, large
+parts may shift to drier savanna-like systems, disrupting continental
+water cycles. Another wide consensus is that impacts are already visible
+and accelerating (heat, drought, floods, crop losses, zoonotic disease
+spread are increasing).
 
-In particular there is consensus that some tipping points could be near, if not already reached. For instance in the Amazon, if deforestation continues, large parts may shift to drier savanna-like systems, disrupting continental water cycles. Another wide consensus is that impacts are already visible and accelerating (heat, drought, floods, crop losses, zoonotic disease spread are increasing).
+\
 
 | Concept | Identified effect |
-|-----------------------|-------------------------------------------------|
+|------------------------|-----------------------------------------------|
 | **Climate patterns** | Average temperatures have risen; heatwaves are more frequent. Rainfall patterns are shifting: some areas are drier (more droughts), others have heavier rains. |
 | **Extreme events** | Stronger and more frequent floods, droughts, wildfires, hurricanes, and intense storms. 2024 saw major hurricanes, floods, and droughts across the region. |
-| **Water resources** | Andean glaciers are retreating rapidly, reducing dry-season water supply for drinking, irrigation, and hydropower. |
+| **Water resources** | Andean glaciers are retreating rapidly, threatening riparian habitats, reducing dry-season water supply for drinking, irrigation, and hydropower. |
 | **Ecosystems** | Amazon deforestation disrupts rainfall cycles and “flying rivers” (moisture flows). Coastal ecosystems (mangroves, reefs) suffer from sea-level rise and acidification. Species loss and species range shifts are already occurring. |
 | **Food security** | Yields are falling in some crops due to heat and rainfall variability. Fisheries are stressed by ocean warming and acidification. Extreme events increase hunger risk in vulnerable populations. |
 | **Zoonosis** | More mosquito-borne diseases (dengue, zika, chikungunya). Heatwaves raise mortality and stress health systems. Many areas lack infrastructure to cope with heat or disasters. |
 
-: Some effects of climate change in Latin America that have been already detected {#tbl-efectos}
+: Some effects of climate change in Latin America that have been already
+detected {#tbl-efectos}
 
-The patterns of climate change in terms of average temperature and rainfall are shown in @fig-mapas and @fig-mapas2. The base line values were calculated for the period 1970-2000. A projection to near future labeled as "2030" was calculated using data for the period 2021-2040.
+\
+
+The patterns of climate change in terms of average temperature and
+rainfall are shown in @fig-mapas and @fig-mapas2. The base line values
+were calculated for the period 1970-2000. A projection to near future
+labeled as "2030" was calculated using data for the period 2021-2040.
 
 ```{r}
 #| label: mapas
@@ -240,14 +326,14 @@ periodo <- "2021-2040"      # "near term" ~ 2030
 
   
 # WorldClim tavg suele estar en °C (algunas versiones antiguas en 0.1 °C). Por si acaso:
-if (max(terra::global(tavg_base, "max", na.rm = TRUE)) > 90) {
+if (max(global(tavg_base, "max", na.rm = TRUE)) > 90) {
   tavg_base <- tavg_base / 10
 }
 
 
 # Agregados anuales baseline
-tmean_base_ann <- terra::app(tavg_base, fun = mean)     # °C
-prec_base_ann  <- terra::app(prec_base, fun = sum)      # mm/año 
+tmean_base_ann <- app(tavg_base, fun = mean)     # °C
+prec_base_ann  <- app(prec_base, fun = sum)      # mm/año 
 
 
 
@@ -265,12 +351,12 @@ for (ssp in ssps) {
   tavg_f <- (tmin_f + tmax_f) / 2
 
   # anual por píxel
-  per_ssp_tann[[ssp]] <- terra::app(tavg_f, mean)  # °C
-  per_ssp_pann[[ssp]] <- terra::app(pr_f,   sum)   # mm/año
+  per_ssp_tann[[ssp]] <- app(tavg_f, mean)  # °C
+  per_ssp_pann[[ssp]] <- app(pr_f,   sum)   # mm/año
 }
 
-tmean_fut_ann <- terra::mean(terra::rast(per_ssp_tann))  # ensemble simple
-prec_fut_ann  <- terra::mean(terra::rast(per_ssp_pann))
+tmean_fut_ann <- mean(rast(per_ssp_tann))  # ensemble simple
+prec_fut_ann  <- mean(rast(per_ssp_pann))
 
 
 mapas <-  list()
@@ -280,10 +366,10 @@ for (ssp in ssps) {
   dP <- (per_ssp_pann[[ssp]] - prec_base_ann) / prec_base_ann * 100
 
   # Exportar GeoTIFF de datos
-  terra::writeRaster(dT, filename = file.path("_output",
+  writeRaster(dT, filename = file.path("_output",
                      sprintf("latam_delta_Tmean_SSP%s_%s.tif", ssp, periodo)),
                      overwrite = TRUE)
-  terra::writeRaster(dP, filename = file.path("_output", 
+  writeRaster(dP, filename = file.path("_output", 
                      sprintf("latam_delta_Pann_pct_SSP%s_%s.tif", ssp, periodo)),
                      overwrite = TRUE)
 
@@ -363,7 +449,6 @@ g1  +  mapas[["585"]][[1]]
 
 ```
 
-
 ```{r}
 #| label: fig-mapas2
 #| fig-cap: Patterns of  rainfall in Latin America
@@ -374,19 +459,35 @@ g2 + mapas[["585"]][[2]]
 
 ```
 
-
-We are framing Latin America vulnerability to climate change using the **IUCN ecosystem typology** for climate action. In particular, IUCN has developed the *Ecosystem Red List & Key Biodiversity Areas (KBA)*, which are tools that help the identification of ecosystems at risk of collapse and areas of high conservation value. This assessment has gathered evidence hr support the view that in Latin America an the Caribbean region particular attention should be directed to Amazon, mangroves, páramos, tropical dry forests and coral reefs. A consensus perspective is emerging suggesting that strong commitments are required to protect–restore–manage habitats, reduce direct climate hazards, and address indirect human–climate synergies (@tbl-drivers).  
+We are framing Latin America vulnerability to climate change using the
+**IUCN ecosystem typology** for climate action. In particular, IUCN has
+developed the *Ecosystem Red List & Key Biodiversity Areas (KBA)*, which
+are tools that help the identification of ecosystems at risk of collapse
+and areas of high conservation value. This assessment has gathered
+evidence hr support the view that in Latin America an the Caribbean
+region particular attention should be directed to Amazon, mangroves,
+páramos, tropical dry forests and coral reefs. A consensus perspective
+is emerging suggesting that strong commitments are required to
+protect–restore–manage habitats, reduce direct climate hazards, and
+address indirect human–climate synergies (@tbl-drivers).
 
 {{< include _drivers-cc-mammal-loss.qmd >}}
 
-
 ```{r}
 #| label: tbl-drivers
-#| tbl-cap: Main drivers of mammal biodiversity loss under current human climate change forcing.
+#| tbl-cap: Main drivers of mammal biodiversity loss under current human climate change forcing. 
 #| echo: false
 
 ft
 ```
 
+{{< include _temp-anomalies.qmd >}}
 
+```{r}
+#| label: fig-anomalias
+#| fig-cap: Temperature anomalies trends considering outsanding eosystems in Ltin America an the Caribbean
+#| echo: false
 
+gg
+
+```
