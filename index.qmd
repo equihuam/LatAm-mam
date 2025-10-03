@@ -97,8 +97,6 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
       if(grepl("temp", title)) {
         paleta <- list("inferno", 0.5, 1.0) 
       } else paleta <- list("turbo", 0.1, 1)
-    # scales::rescale(x, to = to, from = c(min(x, na.rm = TRUE), 1.2)
-    
     gg <- ggplot() +
       geom_tile(data = df, 
                 aes(x = x, y = y, fill = .data[[value_col]]),
@@ -127,17 +125,17 @@ plot_raster <- function(df, value_col, title, subtitle, legend_title, outfile_pn
      return(gg)
   }
 # #------------------------
-#   plot_raster(
-#     df = df_dP,
-#     value_col = names(df_dP)[3],
-#     title = paste0("Δ Annual rainfall (%)"),
-#     subtitle = sprintf("Scenario SSP%s vs 1970–2000; period %s",
-#                        ssp, periodo),
-#     legend_title = "Δ %",
-#     outfile_png = file.path("_output", sprintf("latam_delta_Pann_pct_SSP%s_%s.png", 
-#                             ssp, periodo)),
-#     aoi_sf = aoi
-#   )
+  plot_raster(
+    df = df_dP,
+    value_col = names(df_dP)[3],
+    title = paste0("Δ Annual rainfall (%)"),
+    subtitle = sprintf("Scenario SSP%s vs 1970–2000; period %s",
+                       ssp, periodo),
+    legend_title = "Δ %",
+    outfile_png = file.path("_output", sprintf("latam_delta_Pann_pct_SSP%s_%s.png",
+                            ssp, periodo)),
+    aoi_sf = aoi
+  )
 # #------------------------
 
 # Descarga: futuro CMIP6 y ensemble simple ----
